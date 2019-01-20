@@ -27,4 +27,18 @@ This project was inspired by FreeBSD, Slackware, and CRUX.
 * Install the created package. If the package doesn't exist, it will download it from the repo
 
 `pkg install xorg`
+
+##### Bugs
+* `pkg install <prog>` (pkgadd) sometimes fails (can't find pkgmk) but works the third time
+* BASEDIR set to certain directories will cause a package to fail to uninstall
+
+##### TODO:
+* make `mkport` files for more programs and create a repo
+* create a ports.tar.gz with all programs and their `mkport` files
+* implement `search`, `verify`, etc commands
+* Dependency checking 
+* Creating packages which install to multiple directories
+* Clean up `tstpkg.c` -> might not be necessary - just use `pkg` instead
+* Fork CRUX Linux and use pkg as the package manager
+
    

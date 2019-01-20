@@ -1,0 +1,95 @@
+#!/bin/sh
+
+##
+## pkg: SVR4 package tools wrapper
+##
+. pkgconf
+
+PKG_ADD="/usr/5bin/pkgadd -d"
+PKG_RM="/usr/5bin/pkgrm"
+PKG_PROTO="/usr/5bin/pkgproto"
+PKG_TRANS="/usr/5bin/pkgtrans"
+PKG_LOC="/var/spool/pkg"
+PKG_CK="/usr/5bin/pkginfo"
+
+num() {
+	ls $PKG_LOC | grep pkg | wc -l
+}
+
+envir() {
+	echo ""
+	echo "Package cache:			         $PKG_LOC"
+	echo "No. of Stream Packages (*.pkg) in cache: $(num)"
+	echo "SVR4 package tools:		         $PKG_ADD"
+	echo "			                 $PKG_RM"
+	echo "			                 $PKG_PROTO"
+	echo "			                 $PKG_TRANS"
+	echo ""
+}
+usage() {
+	echo ""
+	echo "usage: pkg search|install|update|remove|delete|sync|list|env|cache|help "
+	echo ""
+    echo "        search  - searches the repository for an SVR4 package" 
+	echo "	install - installs SVR4 package"
+    echo "        update  - update packages"
+	echo "	remove  - uninstalls a package but does not delete it from cache"
+	echo "	delete  - deletes package from cache and system"
+    echo "        sync    - sync with repository"
+    echo "        list    - list all installed packages"
+    echo "        cache   - list all contents of cache"
+	echo "	env     - outputs pkg environment, package cache location"
+	echo "	help    - outputs this message"
+	echo ""
+}
+
+
+# Todo: Write wrappers for downloading sources, compiling sources, pkgproto, pkginfo, pkgmk (strip stream *.pkg)                            
+# Look at CRUX prt-get for better idea of how to use if/elif/else for commandline arguments
+# functions:
+# search - local cache -> searchs/lists the local package cache (pkginfo?)
+# search - online repo -> wgets/curls the online repo and returns any matches (like every other package manager)
+# build - download source/pkg, compiles,
+# make  - takes newly build software and creates prototype, pkinfo, *.pkg
+# reinstall - basically just runs reruns build/install
+
+				# POSIX check for root
+if [[ "$1" == "install" ]] && [[ $(id -u) != 0 ]]; then
+	echo "You must be root to install packages"
+	exit 1
+elif [[ "$1" == "install" ]] && [[ $(id -u) = 0 ]]; then
+	$PKG_ADD $PKG_LOC/$2-*.pkg
+elif [[ "$1" == "remove" ]] && [[ $(id -u) != 0 ]]; then
+	echo "You must be root to remove packages"
+elif [[ "$1" == "remove" ]] && [[ $(id -u) = 0 ]]; then
+	$PKG_RM $2
+elif [[ "$1" == "delete" ]] && [[ $(id -u) != 0 ]]; then
+	echo "You must be root to delete packages"
+elif [[ "$1" == "delete" ]] && [[ $(id -u) = 0 ]]; then
+	## Rewrite so it's more safe...
+	rm $PKG_LOC/"$2".pkg
+	echo "Package \"$PKG_LOC/"$2".pkg\" deleted from cache"
+elif [ "$1" == "list" ]; then
+    $PKG_CK
+elif [ "$1" == "cache" ]; then
+    ls $PKG_LOC
+elif [ "$1" == "env" ]; then
+	envir
+elif [ "$1" == "verify" ]; then
+    PACKAGE=$(ls -f $PKG_CACHE | grep "$2")
+    sha256sum $PKG_CACHE$PACKAGE
+elif [[ "$1" == "help" ]] || [[ -z "$1"  ]]; then
+	usage
+elif [ "$1" == "search" ]; then
+    echo "Searching repository..."
+    echo "WARNING: This feature has not been implemented"
+elif [ "$1" == "update" ]; then
+    echo "Updating system..."
+    echo "WARNING: This feature has not been implemented"
+elif [ "$1" == "sync" ]; then
+    echo "Syncing with remote repo..."
+    echo "WARNING: This feature has not been implemented"
+else
+	echo "pkg: "$1": command not found"
+fi
+

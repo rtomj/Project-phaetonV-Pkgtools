@@ -1,5 +1,5 @@
 ### Project-Phaeton
-Package manager/frontend for the Heirloom SVR4 packaging tools 
+Package manager/frontend for the Heirloom SVR4 packaging tools.
 This project was inspired by FreeBSD, Slackware, and CRUX.
 
 #### Usage

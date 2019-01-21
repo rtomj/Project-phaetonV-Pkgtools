@@ -7,21 +7,22 @@
 PKG_ADD="/usr/5bin/pkgadd -d"
 PKG_AD="/usr/5bin/pkgadd"
 PKG_RM="/usr/5bin/pkgrm"
-PKG_TRANS="/usr/5bin/pkgtrans"
+PKG_TRANS="/usr/5bin/pkgtrans -s"
 PKG_LOC="/var/spool/pkg"
 
 PORTS_LOC="/usr/ports/"
 PKG_CACHE="/var/spool/pkg/"
 PKG_LOC="/usr/ports/$CATEGORY/$PKG/"
-PKG_PROTO="/usr/5bin/pkgproto"
-PKG_MK="/usr/5bin/pkmk"
+PKG_PROTO="/usr/5bin/pkgproto -c"
+PKG_MK="/usr/5bin/pkgmk -o"
 
-function mkpkginfo () {
-    if [ -f ../pkginfo ]; then
+mkpkginfo() {
+    if [ -f ../pkginfo ]
+    then
         rm ../pkginfo
-        continue
     fi
-    if [ ! -f ../pkginfo ]; then
+    if [ ! -f ../pkginfo ]
+    then
         touch ../pkginfo
         echo "PKG=$PKG" >> ../pkginfo
         echo "NAME=$NAME" >> ../pkginfo
@@ -32,7 +33,7 @@ function mkpkginfo () {
     fi
 }
 
-function extract {
+extract() {
         case "$1" in
             *.tar.bz2|*.tbz2|*.tbz)         tar xvjf "$1" ;;
             *.tgz)                          tar zxvf "$1" ;;

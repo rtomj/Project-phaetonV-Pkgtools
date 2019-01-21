@@ -4,6 +4,12 @@
 ##  pkgconf - contains necessary definitions and functions for a mkport file
 ##
 
+PKG_ADD="/usr/5bin/pkgadd -d"
+PKG_AD="/usr/5bin/pkgadd"
+PKG_RM="/usr/5bin/pkgrm"
+PKG_TRANS="/usr/5bin/pkgtrans"
+PKG_LOC="/var/spool/pkg"
+
 PORTS_LOC="/usr/ports/"
 PKG_CACHE="/var/spool/pkg/"
 PKG_LOC="/usr/ports/$CATEGORY/$PKG/"

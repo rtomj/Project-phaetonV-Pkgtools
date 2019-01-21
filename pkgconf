@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/5bin/sh
 
 ##
 ##  pkgconf - contains necessary definitions and functions for a mkport file

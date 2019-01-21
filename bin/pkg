@@ -26,7 +26,7 @@ SVR4 package tools:                      $PKG_ADD
 
 usage() {
 echo "
-usage: pkg search|build|install|update|remove|delete|sync|list|env|help
+usage: pkg search|build|install|update|remove|delete|verify|sync|list|env|help
 
 search  - searches the repository for an SVR4 package
 build   - uses pkgbuild to build a port
@@ -36,6 +36,7 @@ remove  - uninstalls a package but does not delete it from cache
 delete  - deletes package from cache and system
 sync    - sync with repository
 list    - list all installed packages
+verify  - verify hashes of packages
 env     - outputs pkg environment, package cache location
 help    - outputs this message
 "
@@ -78,6 +79,9 @@ case $1 in
     ;;
     help*)
     usage
+    ;;
+    verify*)
+    sha256sum $PKG_LOC/$2-*.pkg
     ;;
     env*)
     envir

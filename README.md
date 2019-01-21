@@ -24,7 +24,7 @@ This project was inspired by FreeBSD, Slackware, and CRUX.
 `pkgbuild x11/xorg`
 
 ##### 3) Installing a port or package
-* Install the created package. If the package doesn't exist, it will download it from the repo
+* Install the created package. If the package doesn't exist, it will download from the repo
 
 `pkg install xorg`
 
@@ -34,11 +34,10 @@ This project was inspired by FreeBSD, Slackware, and CRUX.
 
 ##### TODO:
 * make `mkport` files for more programs and create a repo
-* create a ports.tar.gz with all programs and their `mkport` files
-* implement `search`, `verify`, etc commands
+* create `ports.tar.gz` with all programs and their `mkport` files
+* implement `search`, `build`, `update`, `sync` commands
 * Dependency checking 
 * Creating packages which install to multiple directories
-* Clean up `tstpkg.c` -> might not be necessary - just use `pkg` instead
-* Fork CRUX Linux and use pkg as the package manager
+* Reinstall CRUX Linux, `pkg` as the package manager, and the `heirloom tools` as core binutils
 
    

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/sbin/sh
 
 ##
 ## pkgbuild builds ports from their mkport files
@@ -7,19 +7,19 @@
 # include pkgconf (must be in $PATH)
 . pkgconf
 
-function usage() {
-    echo ""
-    echo " usage: pkgbuild category/port"
-    echo ""
+usage() {
+    echo "
+    usage: pkgbuild category/port
+    "
 }
 
-
-if [ "$1" == 0 ]; then
-    usage
-elif [[ "$1" > 0 ]] && [[ "$UID" != 0 ]]; then
+if [  $USER != root ]
+then
     echo "You must be root to build packages"
-elif [[ "$1" > 0 ]] && [[ "$UID" = 0 ]]; then
-    cd $PKG_LOC"$1"
+    exit 1
+elif [ $USER = root ]
+then
+    cd $PKG_LOC/$1
     ./mkport
 else
     usage

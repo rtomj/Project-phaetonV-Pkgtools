@@ -4,47 +4,63 @@
 ## pkg: SVR4 package tools wrapper
 ##      Uses heirloom sh
 
-# pkgtools
-PKG_ADD="/usr/5bin/pkgadd -d"
-PKG_AD="/usr/5bin/pkgadd"
-PKG_RM="/usr/5bin/pkgrm"
-PKG_TRANS="/usr/5bin/pkgtrans -s"
-PKG_PROTO="/usr/5bin/pkgproto -c"
-PKG_MK="/usr/5bin/pkgmk -o"
-PKG_CK="/usr/5bin/pkginfo"
+## pkgtools
+pkg_add="/usr/5bin/pkgadd -d"
+pkg_ad="/usr/5bin/pkgadd"
+pkg_rm="/usr/5bin/pkgrm"
+pkg_trans="/usr/5bin/pkgtrans -s"
+pkg_proto="/usr/5bin/pkgproto -c"
+pkg_mk="/usr/5bin/pkgmk -o"
+pkg_ck="/usr/5bin/pkginfo"
 
-# Locations
-PKG_LOC="/var/spool/pkg"
-PORTS_LOC="/usr/ports/"
-PORT_LOC="/usr/ports/$CATEGORY/$PKG"
+## locations
+pkg_loc="/var/spool/pkg"
+ports_loc="/usr/ports/"
+port_loc="/usr/ports/"$category"/"$pkg""
+
+##
+## packaging functions
+##
+chpkg() {
+	#echo "===> Checking package"
+	if [ -f "$pkg_loc"/"$pkg"-"$version".pkg ]
+	then
+		echo "===> "$pkg_loc"/"$pkg"-"$version".pkg successfully created"
+	fi
+}
 
 mkpkg() {
 	mkpkginfo
 	mkproto
+	echo "===> Creating package"
     	/usr/5bin/pkgmk -o
-    	/usr/5bin/pkgtrans -s $PKG_LOC $PKG-$VERSION.pkg $PKG
-    	rm -r $PKG_LOC/$PKG
-    	rm -r /tmp/$PKG
+    	/usr/5bin/pkgtrans -s "$pkg_loc" "$pkg"-"$version".pkg "$pkg"
+    	rm -r "$pkg_loc"/"$pkg"
+    	rm -r /tmp/"$pkg"
+	chpkg
 }
 
 mkproto() {
-	/usr/5bin/pkgproto -c $CATEGORY .=. > prototype
+	echo "===> Creating prototype"
+	/usr/5bin/pkgproto -c "$category" .=. > prototype
     	sed -i'' '/=/!d' prototype
     	sed -i'' '1d;2d;' prototype
     	sed -i '1s/^/i pkginfo \n/' prototype
 }
 
 mkpkginfo() {
-	echo "PKG=$PKG" >> pkginfo
-"NAME=$NAME" >> pkginfo
-"VERSION=$VERSION" >> pkginfo
-"ARCH=$ARCH" >> pkginfo
-"CATEGORY=$CATEGORY" >> pkginfo
-"PSTAMP=$VERSION" >> pkginfo
-"BASEDIR=$BASEDIR" >> pkginfo
+	echo "===> Creating pkginfo"
+	echo "PKG="$pkg"" >> pkginfo
+	echo "NAME="$name"" >> pkginfo
+	echo "VERSION="$version"" >> pkginfo
+	echo "ARCH="$arch"" >> pkginfo
+	echo "CATEGORY="$category"" >> pkginfo
+	echo "PSTAMP="$version"" >> pkginfo
+	echo "BASEDIR="$basedir"" >> pkginfo
 }
 
 extract() {
+	echo "===> Extracting archive"
 	case "$1" in
 		*.tar.bz2|*.tbz2|*.tbz)         tar xvjf "$1" ;;
             	*.tgz)                          tar zxvf "$1" ;;
@@ -63,17 +79,20 @@ extract() {
         esac
 }
 
+##
+## pkg functions
+##
 envir() {
-NUM=`ls $PKG_LOC | grep pkg | wc -l`
-INUM=`$PKG_CK | wc -l`
+num=`ls $pkg_loc | grep pkg | wc -l`
+inum=`$pkg_ck | wc -l`
 echo "
-No. of Stream Packages (*.pkg) in cache: $NUM
-No. of Installed Packages:               $INUM
-Package cache location:                  $PKG_LOC
-SVR4 package tools:                      $PKG_ADD
-                                         $PKG_RM
-                                         $PKG_PROTO
-                                         $PKG_TRANS
+No. of Stream Packages (*.pkg) in cache: "$num"
+No. of Installed Packages:               "$inum"
+Package cache location:                  $pkg_loc
+SVR4 package tools:                      $pkg_add
+                                         $pkg_rm
+                                         $pkg_proto
+                                         $pkg_trans
 "
 }
 
@@ -95,22 +114,25 @@ help    - outputs this message
 "
 }
 
+##
+## pkg
+##
 case "$1" in
 	install*|update*|remove*|delete*|sync*)
         # Rewrite this
-    	ID=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
-        if [ $ID != 0 ]
+    	id=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
+        if [ "$id" != 0 ]
         then
         	echo "You must be root"
         	exit 1
-    	elif [ $ID = 0 ]
+    	elif [ "$id" = 0 ]
         then
-		case $1 in
+		case "$1" in
 			install*)
-				if [ $2 > 0 ]
+				if [ "$2" > 0 ]
 				then
-            				VER=`ls $PKG_LOC | grep $2 | tail -n1`
-            				/usr/5bin/pkgadd -d $PKG_LOC/$VER
+            				ver=`ls "$pkg_loc" | grep "$2" | tail -n1`
+            				/usr/5bin/pkgadd -d "$pkg_loc"/"$ver"
 				else
 					echo "You must specify a package name"
 					exit 1
@@ -120,10 +142,10 @@ case "$1" in
             			echo "TODO"
             		;;
 			remove*)
-				$PKG_RM $2
+				"$pkg_rm" "$2"
 			;;
             		delete*)
-            			rm $PKG_LOC$2-*.pkg
+            			rm "$pkg_loc"/"$2"-*.pkg
             		;;
             		sync*)
             			echo "TODO"
@@ -135,13 +157,13 @@ case "$1" in
     	echo "TODO"
     	;;
     	list*)
-    	$PKG_CK
+    	"$pkg_ck"
     	;;
     	help*)
     	usage
     	;;
     	verify*)
-	sha256sum $PKG_LOC/$2-*.pkg
+	sha256sum "$pkg_loc"/"$2"-*.pkg
     	;;
     	env*)
 	envir

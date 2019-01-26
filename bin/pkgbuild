@@ -11,14 +11,14 @@ usage() {
 	echo "usage: pkgbuild category/port"
 }
 
-ID=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
-if [ $ID != 0 ]
+id=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
+if [ $id != 0 ]
 then
 	echo "You must be root"
         exit 1
-elif [ $ID = 0 ]
+elif [ $id = 0 ]
 then
-	cd $PORTS_LOC$1
+	cd $ports_loc$1
         ./mkport
 else
         usage

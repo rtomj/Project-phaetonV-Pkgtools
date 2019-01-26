@@ -7,7 +7,7 @@ This project was inspired by FreeBSD, Slackware, and CRUX.
 
 `ports fetch`
 
-* Downloads `ports.tar.gz` and extracts it to `/usr/ports`
+* Downloads `ports.tar.gz` and extracts it to `/usr/ports/`
 * The file hierarchy is the same as on FreeBSD: `/usr/ports/category/port/`
 * Each port has a `mkport` which is similiar to Slackware's SlackBuilds or CRUX's Pkgfiles
 
@@ -23,15 +23,14 @@ This project was inspired by FreeBSD, Slackware, and CRUX.
 `pkgbuild x11/dmenu`
 
 ##### 3) Installing a port or package
-* Install the created package. If the package doesn't exist, it will download from the repo
+* Install the created package. 
 
 `pkg install dmenu`
 
 ##### TODO:
 * make `mkport` files for more programs and create a repo
-* create `ports.tar.gz` with all programs and their `mkport` files
-* implement `search`, `build`, `update`, `sync` commands
+* make `ports` download `ports.tar.gz` and extract to `/usr/ports`
+* implement `search`, `build`, `update`, `sync`, etc commands
 * Dependency checking - use SVR4 `depend` file or define dependencies in `mkport` files
-* Try using `pkg` as the package manager and the `heirloom tools` as core binutils
 
    

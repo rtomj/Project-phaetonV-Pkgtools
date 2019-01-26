@@ -32,6 +32,6 @@ This project was inspired by FreeBSD, Slackware, and CRUX.
 * create `ports.tar.gz` with all programs and their `mkport` files
 * implement `search`, `build`, `update`, `sync` commands
 * Dependency checking - use SVR4 `depend` file or define dependencies in `mkport` files
-* Try using `pkg` as the package manager, and the `heirloom tools` as core binutils
+* Try using `pkg` as the package manager and the `heirloom tools` as core binutils
 
    

@@ -1,0 +1,35 @@
+#!/bin/sh -e
+
+. /usr/bin/pkg
+
+# Set Variables -> used to create pkginfo file
+PKG=dmenu
+VERSION=4.8
+CATEGORY=x11
+ARCH=x86_64
+SOURCE="http://dl.suckless.org/tools/$PKG-$VERSION.tar.gz"
+BASEDIR="/"
+PSTAMP=$VERSION
+NAME="dynamic menu"
+
+main() {
+    if [ ! -f $PKG-$VERSION.tar.gz ]; then
+        wget $SOURCE
+    fi
+    if [ -f $PKG-$VERSION.tar.gz ]; then
+        extract $PKG-$VERSION.tar.gz
+        build
+    fi
+}
+
+build() {
+
+    cd $PKG-$VERSION
+
+    DESTDIR=/tmp/$PKG make install
+    cd /tmp/$PKG
+
+    mkpkg
+}
+
+main

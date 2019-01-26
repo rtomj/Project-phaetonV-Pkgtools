@@ -4,19 +4,71 @@
 ## pkg: SVR4 package tools wrapper
 ##      Uses heirloom sh
 
-. /usr/bin/pkgconf
-
+# pkgtools
 PKG_ADD="/usr/5bin/pkgadd -d"
 PKG_AD="/usr/5bin/pkgadd"
 PKG_RM="/usr/5bin/pkgrm"
-PKG_TRANS="/usr/5bin/pkgtrans"
-PKG_LOC="/var/spool/pkg"
+PKG_TRANS="/usr/5bin/pkgtrans -s"
+PKG_PROTO="/usr/5bin/pkgproto -c"
+PKG_MK="/usr/5bin/pkgmk -o"
 PKG_CK="/usr/5bin/pkginfo"
 
+# Locations
+PKG_LOC="/var/spool/pkg"
+PORTS_LOC="/usr/ports/"
+PORT_LOC="/usr/ports/$CATEGORY/$PKG"
+
+mkpkg() {
+	mkpkginfo
+	mkproto
+    	/usr/5bin/pkgmk -o
+    	/usr/5bin/pkgtrans -s $PKG_LOC $PKG-$VERSION.pkg $PKG
+    	rm -r $PKG_LOC/$PKG
+    	rm -r /tmp/$PKG
+}
+
+mkproto() {
+	/usr/5bin/pkgproto -c $CATEGORY .=. > prototype
+    	sed -i'' '/=/!d' prototype
+    	sed -i'' '1d;2d;' prototype
+    	sed -i '1s/^/i pkginfo \n/' prototype
+}
+
+mkpkginfo() {
+	echo "PKG=$PKG" >> pkginfo
+    	echo "NAME=$NAME" >> pkginfo
+    	echo "VERSION=$VERSION" >> pkginfo
+    	echo "ARCH=$ARCH" >> pkginfo
+    	echo "CATEGORY=$CATEGORY" >> pkginfo
+    	echo "PSTAMP=$VERSION" >> pkginfo
+    	echo "BASEDIR=$BASEDIR" >> pkginfo
+}
+
+extract() {
+	case "$1" in
+		*.tar.bz2|*.tbz2|*.tbz)         tar xvjf "$1" ;;
+            	*.tgz)                          tar zxvf "$1" ;;
+            	*.tar.gz)                       tar xvzf "$1" ;;
+            	*.tar.xz)                       tar xvJf "$1" ;;
+            	*.tar)                          tar xvf "$1" ;;
+            	*.rar)                          7z x "$1" ;;
+            	*.zip)                          unzip "$1" ;;
+            	*.7z)                           7z x "$1" ;;
+            	*.lzo)                          lzop -d  "$1" ;;
+            	*.gz)                           gunzip "$1" ;;
+            	*.bz2)                          bunzip2 "$1" ;;
+            	*.Z)                            uncompress "$1" ;;
+            	*.xz|*.txz|*.lzma|*.tlz)        xz -d "$1" ;;
+            	*) echo "'$1' could not be decompressed." ;;
+        esac
+}
+
 envir() {
-num="`ls $PKG_LOC | grep pkg | wc -l`"
+NUM=`ls $PKG_LOC | grep pkg | wc -l`
+INUM=`$PKG_CK | wc -l`
 echo "
-No. of Stream Packages (*.pkg) in cache: $num
+No. of Stream Packages (*.pkg) in cache: $NUM
+No. of Installed Packages:               $INUM
 Package cache location:                  $PKG_LOC
 SVR4 package tools:                      $PKG_ADD
                                          $PKG_RM
@@ -27,10 +79,9 @@ SVR4 package tools:                      $PKG_ADD
 
 usage() {
 echo "
-usage: pkg search|build|install|update|remove|delete|verify|sync|list|env|help
+usage: pkg search|install|update|remove|delete|sync|list|verify|env|ver|help
 
 search  - searches the repository for an SVR4 package
-build   - uses pkgbuild to build a port
 install - installs SVR4 package
 update  - update packages
 remove  - uninstalls a package but does not delete it from cache
@@ -39,56 +90,64 @@ sync    - sync with repository
 list    - list all installed packages
 verify  - verify hashes of packages
 env     - outputs pkg environment, package cache location
+ver     - check pkg version
 help    - outputs this message
 "
 }
 
-case $1 in
-	install*|update*|remove*|delete*|build*|sync*)
-    	if [ $USER != root ]; then
+case "$1" in
+	install*|update*|remove*|delete*|sync*)
+        # Rewrite this
+    	ID=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
+        if [ $ID != 0 ]
+        then
         	echo "You must be root"
         	exit 1
-    	elif [ $USER = root ]; then
+    	elif [ $ID = 0 ]
+        then
 		case $1 in
 			install*)
-            ## Added statement so that a package with a version no. can be installed
-            $PKG_ADD $PKG_LOC/$2-*.pkg
-            ;;
-            update*)
-            echo "TODO"
-            ;;
-		    remove*)
-			$PKG_RM $2
+				if [ $2 > 0 ]
+				then
+            				VER=`ls $PKG_LOC | grep $2 | tail -n1`
+            				/usr/5bin/pkgadd -d $PKG_LOC/$VER
+				else
+					echo "You must specify a package name"
+					exit 1
+				fi				
+				;;
+            		update*)
+            			echo "TODO"
+            		;;
+			remove*)
+				$PKG_RM $2
 			;;
-            delete*)
-            rm $PKG_LOC$2-*.pkg
-            ;;
-            build*)
-            echo "TODO: add this functionality to pkgbuild"
-            ;;
-            sync*)
-            echo "TODO"
-            ;;
+            		delete*)
+            			rm $PKG_LOC$2-*.pkg
+            		;;
+            		sync*)
+            			echo "TODO"
+            		;;
 		esac
-	    fi
-    ;;
-    search*)
-    echo "TODO"
-    ;;
-    list*)
-    $PKG_CK
-    ;;
-    help*)
-    usage
-    ;;
-    verify*)
-    sha256sum $PKG_LOC/$2-*.pkg
-    ;;
-    env*)
-    envir
-    ;;
-    *)
-    usage
+	fi
+	;;
+    	search*)
+    	echo "TODO"
+    	;;
+    	list*)
+    	$PKG_CK
+    	;;
+    	help*)
+    	usage
+    	;;
+    	verify*)
+	sha256sum $PKG_LOC/$2-*.pkg
+    	;;
+    	env*)
+	envir
+    	;;
+    	ver*)
+    	/usr/5bin/pkginfo -x pkg
     ;;
 esac
 

@@ -36,12 +36,12 @@ mkproto() {
 
 mkpkginfo() {
 	echo "PKG=$PKG" >> pkginfo
-    	echo "NAME=$NAME" >> pkginfo
-    	echo "VERSION=$VERSION" >> pkginfo
-    	echo "ARCH=$ARCH" >> pkginfo
-    	echo "CATEGORY=$CATEGORY" >> pkginfo
-    	echo "PSTAMP=$VERSION" >> pkginfo
-    	echo "BASEDIR=$BASEDIR" >> pkginfo
+"NAME=$NAME" >> pkginfo
+"VERSION=$VERSION" >> pkginfo
+"ARCH=$ARCH" >> pkginfo
+"CATEGORY=$CATEGORY" >> pkginfo
+"PSTAMP=$VERSION" >> pkginfo
+"BASEDIR=$BASEDIR" >> pkginfo
 }
 
 extract() {

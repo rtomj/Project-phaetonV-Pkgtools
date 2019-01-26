@@ -17,7 +17,7 @@ This project was inspired by FreeBSD, Slackware, and CRUX.
 
 `./mkport`
 
-* This will create an `dmenu-$VERSION.pkg` in `/var/spool/pkg`
+* This will create a `dmenu-$VERSION.pkg` in `/var/spool/pkg`
 * You can also use `pkgbuild category/port`
 
 `pkgbuild x11/dmenu`

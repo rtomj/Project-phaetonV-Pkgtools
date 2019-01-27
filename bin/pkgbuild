@@ -4,7 +4,6 @@
 ## pkgbuild builds ports from their mkport files
 ##
 
-# include pkg
 . /usr/bin/pkg
 
 usage() {
@@ -12,13 +11,13 @@ usage() {
 }
 
 id=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
-if [ $id != 0 ]
+if [ "$id" != 0 ]
 then
 	echo "You must be root"
         exit 1
-elif [ $id = 0 ]
+elif [ "$id" = 0 ]
 then
-	cd $ports_loc$1
+	cd "$ports_loc""$1"
         ./mkport
 else
         usage

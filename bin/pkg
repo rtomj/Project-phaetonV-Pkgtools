@@ -97,29 +97,28 @@ SVR4 package tools:                      $pkg_add
 }
 
 usage() {
-echo "
-usage: pkg search|install|update|remove|delete|sync|list|verify|env|ver|help
+echo "usage: pkg [command] [argument]
 
-search  - searches the repository for an SVR4 package
-install - installs SVR4 package
-update  - update packages
-remove  - uninstalls a package but does not delete it from cache
-delete  - deletes package from cache and system
-sync    - sync with repository
-list    - list all installed packages
-verify  - verify hashes of packages
-env     - outputs pkg environment, package cache location
-ver     - check pkg version
-help    - outputs this message
-"
+Available commands:
+search  (-s)  - searches the repository [TODO]
+install (-i)  - installs SVR4 package
+update  (-u)  - updates packages [TODO]
+remove  (-r)  - uninstalls a package but does not delete it from cache
+delete  (-d)  - deletes package from cache and system
+sync    (-sy) - sync with repository [TODO]
+list    (-l)  - list all installed packages
+verify  (-vf) - verify hashes of packages
+env     (-e)  - outputs pkg environment and package cache details
+ver     (-v)  - check pkg version
+help    (-h)  - outputs this message"
 }
 
 ##
 ## pkg
 ##
 case "$1" in
-	install*|update*|remove*|delete*|sync*)
-        # Rewrite this
+	install*|-i*|update*|-u*|remove*|-r*|delete*|-d*|sync*|-sy*)
+        # using heirloom tools to check for root
     	id=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
         if [ "$id" != 0 ]
         then
@@ -128,7 +127,7 @@ case "$1" in
     	elif [ "$id" = 0 ]
         then
 		case "$1" in
-			install*)
+			install*|-i*)
 				if [ "$2" > 0 ]
 				then
             				ver=`ls "$pkg_loc" | grep "$2" | tail -n1`
@@ -138,38 +137,44 @@ case "$1" in
 					exit 1
 				fi				
 				;;
-            		update*)
+            		update*|-u*)
             			echo "TODO"
             		;;
-			remove*)
+			remove*|-r*)
 				"$pkg_rm" "$2"
 			;;
-            		delete*)
+            		delete*|-d*)
             			rm "$pkg_loc"/"$2"-*.pkg
             		;;
-            		sync*)
+            		sync*|-sy*)
             			echo "TODO"
             		;;
 		esac
 	fi
 	;;
-    	search*)
+    	search*|-s*)
     	echo "TODO"
     	;;
-    	list*)
+    	list*|-l*)
     	"$pkg_ck"
     	;;
-    	help*)
+    	help*|-h*)
     	usage
     	;;
-    	verify*)
-	sha256sum "$pkg_loc"/"$2"-*.pkg
+    	verify*|-vf*)
+		if [ "$2" = '' ]
+		then
+			echo "You must specify a package"
+			exit 1
+		elif [ "$2" != '' ]
+		then
+		sha256sum "$pkg_loc"/"$2"-*.pkg
+		fi
     	;;
-    	env*)
+    	env*|-e*)
 	envir
     	;;
-    	ver*)
+    	ver*|-v*)
     	/usr/5bin/pkginfo -x pkg
-    ;;
+    	;;
 esac
-

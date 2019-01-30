@@ -1,0 +1,21 @@
+#!/usr/5bin/sh -e
+
+. /usr/bin/pkg
+
+pkg=otawk
+version=20180827
+category=lang
+arch=x86_64
+source="https://github.com/onetrueawk/awk/archive/"$version".tar.gz"
+basedir="/usr/local/bin"
+pstamp="$version"
+name="one true awk"
+
+wget $source
+tar xf $version.tar.gz
+cd awk-"$version"
+mkdir /tmp/$pkg
+make
+mv a.out /tmp/$pkg/otawk
+cd /tmp/"$pkg"
+mkpkg

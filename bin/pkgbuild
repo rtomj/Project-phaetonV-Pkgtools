@@ -18,7 +18,9 @@ then
 elif [ "$id" = 0 ]
 then
 	cd "$ports_loc""$1"
-        ./mkport
+    ./mkport
+    pack=` echo "$1" | awk -F'/' '{print $2}'`
+    /usr/bin/pkg -i $pack
 else
         usage
 fi

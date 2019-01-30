@@ -1,0 +1,32 @@
+#!/usr/5bin/sh
+
+. /usr/bin/pkg
+
+# Very basic update script that checks installed package against ChangeLog.txt
+
+id=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
+if [ "$id" != 0 ]
+then
+    echo "You must be root"
+    exit 1
+elif [ "$id" = 0 ]
+then
+    echo "===> Checking ChangeLog.txt"
+    old=`/usr/5bin/pkginfo -x "$1" |awk 'NR==2{print $2}'`
+    new=`grep "$1" ChangeLog.txt |awk '{print $2}'`
+    if [ $old = $new ]
+    then
+        echo ""$1"-"$old".pkg is the latest version"
+    elif [ $old < $new ]
+    then
+        echo "===> Upgrade "$1"-"$old" to "$1"-"$new" (y/n)?"
+        read answer
+        if [ $answer = y ]; then
+            /usr/5bin/pkgrm -n "$1"
+            ver=`ls "$pkg_loc" | grep "$1" | tail -n1`
+            /usr/5bin/pkgadd -d "$pkg_loc"/"$ver"
+        elif [ $answer = n ]; then
+            exit 1
+        fi
+    fi
+fi

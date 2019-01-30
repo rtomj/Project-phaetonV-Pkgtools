@@ -17,7 +17,7 @@ pkg_ck="/usr/5bin/pkginfo"
 pkg_loc="/var/spool/pkg"
 ports_loc="/usr/ports/"
 port_loc="/usr/ports/"$category"/"$pkg""
-
+conf_loc="/etc/pkg"
 ##
 ## packaging functions
 ##
@@ -25,27 +25,34 @@ chpkg() {
 	#echo "===> Checking package"
 	if [ -f "$pkg_loc"/"$pkg"-"$version".pkg ]
 	then
-		echo "===> "$pkg_loc"/"$pkg"-"$version".pkg successfully created"
-	fi
+        echo "======================================================================="
+		/usr/ucb/echo "===> "$pkg_loc"/"$pkg"-"$version".pkg successfully created"
+        echo "======================================================================="
+    fi
 }
 
 mkpkg() {
 	mkpkginfo
 	mkproto
-	echo "===> Creating package"
+	/usr/ucb/echo "===> Creating package"
     	/usr/5bin/pkgmk -o
     	/usr/5bin/pkgtrans -s "$pkg_loc" "$pkg"-"$version".pkg "$pkg"
-    	rm -r "$pkg_loc"/"$pkg"
-    	rm -r /tmp/"$pkg"
+    	/usr/5bin/rm -r "$pkg_loc"/"$pkg"
+    	/usr/5bin/rm -r /tmp/"$pkg"
 	chpkg
 }
 
 mkproto() {
-	echo "===> Creating prototype"
+	/usr/ucb/echo "===> Creating prototype"
 	/usr/5bin/pkgproto -c "$category" .=. > prototype
-    	sed -i'' '/=/!d' prototype
-    	sed -i'' '1d;2d;' prototype
-    	sed -i '1s/^/i pkginfo \n/' prototype
+
+    # heirloom sed (derived from Solaris) has no -i option...
+    tmp=`mktemp prototype.XXXXXX`
+    /usr/5bin/sed '/=/!d' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && /usr/5bin/rm "$tmp"
+    /usr/5bin/sed '1d;2d;' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && /usr/5bin/rm "$tmp"
+    # newline
+    /usr/5bin/sed '1s/^/i pkginfo\
+    /' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && /usr/5bin/rm "$tmp"
 }
 
 mkpkginfo() {
@@ -82,8 +89,41 @@ extract() {
 ##
 ## pkg functions
 ##
+
+mkdep() {
+    echo "===> Building dependencies"
+    for i in $DEPS
+    do
+        pkgbuild $i
+    done
+
+}
+
+update() {
+    echo "===> Checking ChangeLog.txt"
+    echo "1=$1"
+    echo "2=$2"
+    old=`/usr/5bin/pkginfo -x $1 | /usr/5bin/awk 'NR==2{print $2}'`
+    new=`/usr/5bin/grep $1 "$conf_loc"/ChangeLog.txt | /usr/5bin/awk '{print $2}'`
+    if [ $old = $new ]
+    then
+        echo " "$1"-"$old".pkg is the latest version"
+    elif [ $old < $new ]
+    then
+        echo "===> Upgrade "$1"-"$old" to "$1"-"$new" (y/n)?"
+        read answer
+        if [ $answer = y ]; then
+            /usr/5bin/pkgrm -n "$1"
+            ver=`ls "$pkg_loc" | /usr/5bin/awk '/$1/' | /usr/5bin/tail -n1`
+            /usr/5bin/pkgadd -d "$pkg_loc"/"$ver"
+        elif [ $answer = n ]; then
+            exit 1
+        fi
+    fi
+}
+
 envir() {
-num=`ls $pkg_loc | grep pkg | wc -l`
+num=`ls $pkg_loc | /usr/5bin/grep pkg | wc -l`
 inum=`$pkg_ck | wc -l`
 echo "
 No. of Stream Packages (*.pkg) in cache: "$num"
@@ -119,7 +159,7 @@ help    (-h)  - outputs this message"
 case "$1" in
 	install*|-i*|update*|-u*|remove*|-r*|delete*|-d*|sync*|-sy*)
         # using heirloom tools to check for root
-    	id=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
+    	id=`id | /usr/5bin/awk -F'=' '{print $2}' | /usr/5bin/awk -F'(' '{print $1}'`
         if [ "$id" != 0 ]
         then
         	echo "You must be root"
@@ -130,21 +170,21 @@ case "$1" in
 			install*|-i*)
 				if [ "$2" > 0 ]
 				then
-            				ver=`ls "$pkg_loc" | grep "$2" | tail -n1`
+            				ver=`ls "$pkg_loc" | /usr/5bin/grep "$2" | /usr/5bin/tail -n1`
             				/usr/5bin/pkgadd -d "$pkg_loc"/"$ver"
 				else
 					echo "You must specify a package name"
 					exit 1
-				fi				
+				fi
 				;;
-            		update*|-u*)
-            			echo "TODO"
+            update*|-u*)
+            	update "$2"
             		;;
 			remove*|-r*)
 				"$pkg_rm" "$2"
 			;;
             		delete*|-d*)
-            			rm "$pkg_loc"/"$2"-*.pkg
+            			/usr/5bin/rm "$pkg_loc"/"$2"-*.pkg
             		;;
             		sync*|-sy*)
             			echo "TODO"
@@ -175,6 +215,6 @@ case "$1" in
 	envir
     	;;
     	ver*|-v*)
-    	/usr/5bin/pkginfo -x pkg
+    	/usr/5bin/pkginfo -x pkgtools
     	;;
 esac

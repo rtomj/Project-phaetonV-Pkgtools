@@ -27,10 +27,22 @@ This project was inspired by FreeBSD, Slackware, and CRUX.
 
 `pkg install dmenu`
 
+##### 4) Updating a port or package
+`pkg sync`
+
+* Downloads the latest ChangeLog.txt [TODO]
+
+`pkg update dmenu`
+
+##### Bugs
+* `pkg` creates a `0` file in working directories?
+
 ##### TODO:
+* some things could probably be written better
 * make `mkport` files for more programs and create a repo
 * make `ports` download `ports.tar.gz` and extract to `/usr/ports`
-* implement `search`, `build`, `update`, `sync`, etc commands
-* Dependency checking - use SVR4 `depend` file or define dependencies in `mkport` files
+* implement `search`, `sync`, etc commands
+* Make an `update all` command
+
 
    

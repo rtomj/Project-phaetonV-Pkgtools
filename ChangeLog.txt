@@ -1,6 +1,5 @@
 dmenu 4.8
 ex 050325
-icecat	60.3.0
+icecat 60.4.0
 otawk 20180827
-pkgtools 0.8.1
-
+pkgtools 0.8.2

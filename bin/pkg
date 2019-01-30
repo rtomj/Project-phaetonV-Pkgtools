@@ -91,31 +91,44 @@ extract() {
 ##
 
 mkdep() {
-    echo "===> Building dependencies"
-    for i in $DEPS
+    echo "===> Checking dependencies for $pkg"
+    for i in $deps
     do
-        pkgbuild $i
+        echo "===> Checking dependencies for $i"
+        a=`echo $i | awk -F '/' '{print $2}'`
+        d=`/usr/5bin/pkginfo | grep -c $a`
+        if [ $d = 0 ]
+        then
+            echo "======================================================================="
+            echo "===> Building $i"
+            echo "======================================================================="
+            pkgbuild $i
+        else
+            echo "===> $a is already installed"
+        fi
     done
-
 }
+
 
 update() {
     echo "===> Checking ChangeLog.txt"
-    echo "1=$1"
-    echo "2=$2"
+    #echo "1=$1"
+    #echo "2=$2"
     old=`/usr/5bin/pkginfo -x $1 | /usr/5bin/awk 'NR==2{print $2}'`
     new=`/usr/5bin/grep $1 "$conf_loc"/ChangeLog.txt | /usr/5bin/awk '{print $2}'`
     if [ $old = $new ]
     then
-        echo " "$1"-"$old".pkg is the latest version"
-    elif [ $old < $new ]
+        echo ""$1"-"$old".pkg is the latest version"
+    elif [ $new > $old ]
     then
         echo "===> Upgrade "$1"-"$old" to "$1"-"$new" (y/n)?"
         read answer
         if [ $answer = y ]; then
+            echo "===> Removing old package"
             /usr/5bin/pkgrm -n "$1"
-            ver=`ls "$pkg_loc" | /usr/5bin/awk '/$1/' | /usr/5bin/tail -n1`
-            /usr/5bin/pkgadd -d "$pkg_loc"/"$ver"
+            echo "===> Upgrading package"
+            ver=`ls "$pkg_loc" | /usr/5bin/grep $1 | /usr/5bin/tail -n1`
+            /usr/5bin/pkgadd -d $pkg_loc/"$ver"
         elif [ $answer = n ]; then
             exit 1
         fi

@@ -3,7 +3,7 @@
 . /usr/bin/pkg
 
 pkg=pkgtools
-version=0.8
+version=0.8.2
 category=base
 arch="x86_64"
 basedir="/usr/bin"

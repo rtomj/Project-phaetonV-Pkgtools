@@ -1,4 +1,4 @@
-#!/usr/5bin/sh
+#!/sbin/sh
 
 ##
 ## pkg: SVR4 package tools wrapper

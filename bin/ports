@@ -1,4 +1,4 @@
-#!/usr/5bin/sh -e
+#!/sbin/sh
 
 . /usr/bin/pkg
 

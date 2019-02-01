@@ -10,27 +10,14 @@ source="http://dl.suckless.org/tools/$pkg-$version.tar.gz"
 basedir="/"
 pstamp="$version"
 name="dynamic menu"
+        
 
-main() {
-    if [ ! -f "$pkg"-"$version".tar.gz ]
-    then
-        wget "$source"
-    fi
-    if [ -f "$pkg"-"$version".tar.gz ]
-    then
-        extract "$pkg"-"$version".tar.gz
-        build
-    fi
-}
+wget "$source"
+tar xf "$pkg"-"$version".tar.gz
 
-build() {
+cd "$pkg"-"$version"
 
-    cd "$pkg"-"$version"
+DESTDIR=/tmp/"$pkg" make install
+cd /tmp/"$pkg"
 
-    DESTDIR=/tmp/"$pkg" make install
-    cd /tmp/"$pkg"
-
-    mkpkg
-}
-
-main
+mkpkg

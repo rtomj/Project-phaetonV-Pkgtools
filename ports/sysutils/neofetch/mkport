@@ -1,0 +1,25 @@
+#!/sbin/sh
+
+. /usr/bin/pkg
+
+pkg=neofetch
+version=6.0.0
+category=sysutils
+arch="x86_64"
+basedir="/usr/local"
+pstamp="$version"
+name="system info tool"
+source="https://github.com/dylanaraps/neofetch/archive/6.0.0/neofetch-6.0.0.tar.gz"
+
+mkdir -p /tmp/"$pkg"
+
+wget "$source"
+tar xf "$pkg"-"$version".tar.gz
+
+cd "$pkg"-$version
+
+make install DESTDIR=/tmp/"$pkg" 
+
+cd /tmp/"$pkg"
+mkpkg
+

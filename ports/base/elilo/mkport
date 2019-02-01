@@ -1,0 +1,34 @@
+#!/sbin/sh
+
+. /usr/bin/pkg
+
+pkg=elilo
+version=3.16
+category=base
+arch=x86_64
+basedir="/"
+pstamp=$version
+name="elilo boot manager"
+source="https://mirrors.slackware.com/slackware/slackware-current/source/a/elilo/elilo-3.16-all.tar.xz"
+source2="https://mirrors.slackware.com/slackware/slackware-current/source/a/elilo/elilo.loader.binaries.tar.xz"
+deps="base/gnu-efi"
+
+mkdep
+wget "$source"
+wget "$source2"
+
+mkdir -p /tmp/$pkg/usr/sbin
+
+/bin/tar xJf elilo-$version-all.tar.xz
+/bin/tar xJf elilo.loader.binaries.tar.xz
+tar xf elilo-$version-source.tar.gz
+
+mkdir -p /tmp/$pkg/boot/efi/EFI/elilo
+cp elilo-3.16-x86_64.efi /tmp/$pkg/boot/efi/EFI/elilo/elilo.efi
+
+cd elilo-$version-source
+
+cp tools/eliloalt /tmp/$pkg/usr/sbin
+
+cd /tmp/$pkg
+mkpkg

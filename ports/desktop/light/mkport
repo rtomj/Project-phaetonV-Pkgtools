@@ -1,0 +1,28 @@
+#!/sbin/sh
+
+. /usr/bin/pkg
+
+pkg=light
+version="1.0"
+category=desktop
+arch="x86_64"
+basedir="/"
+pstamp="$version"
+name="backlight controller"
+source="https://github.com/haikarainen/light/archive/v1.0/light-1.0.tar.gz"
+deps="doc/help2man"
+
+mkdep
+mkdir -p /tmp/"$pkg"
+
+wget "$source"
+tar xf "$pkg"-"$version".tar.gz
+
+cd "$pkg"-$version
+
+./configure
+DESTDIR=/tmp/"$pkg" make install
+
+cd /tmp/"$pkg"
+mkpkg
+

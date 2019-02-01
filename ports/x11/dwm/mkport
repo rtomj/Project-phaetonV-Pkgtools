@@ -1,0 +1,22 @@
+#!/sbin/sh
+
+. /usr/bin/pkg
+
+pkg="dwm"
+version="6.1"
+category="x11"
+arch="x86_64"
+source="https://dl.suckless.org/$pkg/$pkg-$version.tar.gz"
+basedir="/"
+pstamp="$version"
+name="dynamic window manger"
+        
+
+wget "$source"
+tar xf "$pkg"-"$version".tar.gz
+cd "$pkg"-"$version"
+
+make CC=gcc X11INC=/usr/include
+make DESTDIR=/tmp/"$pkg" PREFIX=/usr/local install
+cd /tmp/"$pkg"
+mkpkg

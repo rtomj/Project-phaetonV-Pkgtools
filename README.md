@@ -1,6 +1,6 @@
 ### Project-Phaeton
 Package manager/frontend for the Heirloom SVR4 packaging tools.
-This project was inspired by FreeBSD, Slackware, and CRUX.
+This project was tested on CRUX 3.4.
 
 #### Usage
 ##### 1) Get the ports tree 

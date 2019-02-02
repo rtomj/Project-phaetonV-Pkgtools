@@ -181,10 +181,18 @@ case "$1" in
         then
 		case "$1" in
 			install*|-i*)
-				if [ "$2" > 0 ]
+				if [ -n "$2" ]
 				then
-            				ver=`ls "$pkg_loc" | /usr/5bin/grep "$2" | /usr/5bin/tail -n1`
-            				/usr/5bin/pkgadd -d "$pkg_loc"/"$ver"
+					pack=$2
+                                        ver=`ls "$pkg_loc" | /usr/5bin/s42/grep "\<$pack\>" | /usr/5bin/tail -n1`
+					if [ -z "$ver" ]
+					then
+						echo "Package not found"
+						exit 1
+					elif [ -n "$ver" ]
+					then
+						/usr/5bin/pkgadd -d "$pkg_loc"/"$ver"
+					fi
 				else
 					echo "You must specify a package name"
 					exit 1
@@ -215,11 +223,11 @@ case "$1" in
     	usage
     	;;
     	verify*|-vf*)
-		if [ "$2" = '' ]
+		if [ -z "$2" ]
 		then
 			echo "You must specify a package"
 			exit 1
-		elif [ "$2" != '' ]
+		elif [ -n "$2" ]
 		then
 		sha256sum "$pkg_loc"/"$2"-*.pkg
 		fi

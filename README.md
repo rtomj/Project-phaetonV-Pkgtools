@@ -34,12 +34,10 @@ This project was tested on CRUX 3.4.
 
 `pkg update dmenu`
 
-##### Bugs
-* `pkg` creates a `0` file in working directories?
-
 ##### TODO:
+* Create a SQLite `/var/db/pkg/ports.sqlite` database for ports like FreeBSD? 
 * some things could probably be written better
-* make `mkport` files for more programs and create a repo
+* make `mkport` files for more programs and  create a repo
 * make `ports` download `ports.tar.gz` and extract to `/usr/ports`
 * implement `search`, `sync`, etc commands
 * Make an `update all` command

@@ -1,8 +1,8 @@
-#!/sbin/sh
+#!/bin/sh
 
 ##
 ## pkg: SVR4 package tools wrapper
-##      Uses heirloom sh
+##      Uses Schily POSIX Bourne Shell
 
 ## pkgtools
 pkg_add="/usr/5bin/pkgadd -d"

@@ -2,7 +2,12 @@
 Package manager/frontend for the Heirloom SVR4 packaging tools.
 This project was tested on CRUX 3.4.
 
-#### Usage
+#### Installation
+* Install [Heirloom Tools](http://heirloom.sourceforge.net/) and add to `$PATH`
+* Use `bin/pkg` as a bootstrap to install `base/pkgtools`
+* For the upcoming POSIX version, install the [Schily Bourne Shell](http://schilytools.sourceforge.net/bosh.html)
+
+##### Usage
 ##### 1) Get the ports tree 
 
 `ports fetch`
@@ -35,6 +40,7 @@ This project was tested on CRUX 3.4.
 `pkg update dmenu`
 
 ##### TODO:
+* Create a POSIX version with Schily Bourne Shell 
 * Create a SQLite `/var/db/pkg/ports.sqlite` database for ports like FreeBSD? 
 * some things could probably be written better
 * make `mkport` files for more programs and  create a repo

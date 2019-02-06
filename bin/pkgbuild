@@ -1,4 +1,4 @@
-#!/sbin/sh
+#!/bin/sh
 
 ##
 ## pkgbuild builds ports from their mkport files
@@ -18,9 +18,9 @@ then
 elif [ "$id" = 0 ]
 then
 	cd "$ports_loc""$1"
-    ./mkport
-    pack=` echo "$1" | awk -F'/' '{print $2}'`
-    /usr/bin/pkg -i $pack
+	./mkport
+	pack=` echo "$1" | awk -F'/' '{print $2}'`
+	/usr/bin/pkg -i $pack
 else
         usage
 fi

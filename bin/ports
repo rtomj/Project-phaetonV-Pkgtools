@@ -1,6 +1,6 @@
-#!/sbin/sh
+#!/bin/sh
 
-. /usr/bin/pkg
+. pkg
 
 #
 # ports utility

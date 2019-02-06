@@ -4,8 +4,8 @@ This project was tested on CRUX 3.4.
 
 #### Installation
 * Install [Heirloom Tools](http://heirloom.sourceforge.net/) and add to `$PATH`
+* Make sure heirloom sh is installed to /sbin/sh
 * Use `bin/pkg` as a bootstrap to install `base/pkgtools`
-* For the upcoming POSIX version, install the [Schily Bourne Shell](http://schilytools.sourceforge.net/bosh.html)
 
 ##### Usage
 ##### 1) Get the ports tree 
@@ -40,7 +40,7 @@ This project was tested on CRUX 3.4.
 `pkg update dmenu`
 
 ##### TODO:
-* Create a POSIX version with Schily Bourne Shell 
+* Create a POSIX version with Schily Bourne Shell or Ash/dash 
 * Create a SQLite `/var/db/pkg/ports.sqlite` database for ports like FreeBSD? 
 * some things could probably be written better
 * make `mkport` files for more programs and  create a repo

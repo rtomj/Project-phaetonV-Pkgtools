@@ -3,7 +3,7 @@
 . pkg
 
 pkg="dwm"
-version="6.1"
+version="6.2"
 category="x11"
 arch="x86_64"
 source="https://dl.suckless.org/$pkg/$pkg-$version.tar.gz"

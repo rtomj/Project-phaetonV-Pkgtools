@@ -3,7 +3,7 @@
 . pkg
 
 pkg="dmenu"
-version="4.8"
+version="4.9"
 category="x11"
 arch="x86_64"
 source="http://dl.suckless.org/tools/$pkg-$version.tar.gz"

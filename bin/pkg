@@ -32,6 +32,7 @@ chpkg() {
 }
 
 mkpkg() {
+	cd /tmp/$pkg
 	mkpkginfo
 	mkproto
 	/usr/ucb/echo "===> Creating package"
@@ -49,6 +50,7 @@ mkproto() {
     # heirloom sed (derived from Solaris) has no -i option...
     tmp=`mktemp prototype.XXXXXX`
     /usr/5bin/sed '/=/!d' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && /usr/5bin/rm "$tmp"
+    # exclude pkginfo and prototype
     /usr/5bin/sed '1d;2d;' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && /usr/5bin/rm "$tmp"
     # newline
     /usr/5bin/sed '1s/^/i pkginfo\

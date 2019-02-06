@@ -1,4 +1,4 @@
-#!/sbin/sh
+#!/bin/sh
 
 . pkg
 
@@ -24,8 +24,8 @@ make install \
 	PREFIX=/usr/local \
 	DESTDIR=/tmp/"$pkg"
 	
-
 cd /tmp/"$pkg"
 ln -s /tmp/$pkg/usr/local/bin/$pkg /bin/ksh
+
 mkpkg
 

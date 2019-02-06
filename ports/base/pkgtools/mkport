@@ -1,6 +1,6 @@
-#!/usr/5bin/sh -e
+#!/bin/sh 
 
-. /usr/bin/pkg
+. pkg
 
 pkg=pkgtools
 version=0.8.4
@@ -15,6 +15,6 @@ mkdir -p /tmp/"$pkg"
 cd "$pkg"
 cp pkg /tmp/"$pkg"
 cp pkgbuild /tmp/"$pkg"
-cd /tmp/"$pkg"
+
 mkpkg
 

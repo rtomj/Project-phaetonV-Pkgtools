@@ -1,6 +1,6 @@
-#!/usr/5bin/sh -e
+#!/bin/sh
 
-. /usr/bin/pkg
+. pkg
 
 pkg="dmenu"
 version="4.8"
@@ -18,6 +18,5 @@ tar xf "$pkg"-"$version".tar.gz
 cd "$pkg"-"$version"
 
 DESTDIR=/tmp/"$pkg" make install
-cd /tmp/"$pkg"
 
 mkpkg

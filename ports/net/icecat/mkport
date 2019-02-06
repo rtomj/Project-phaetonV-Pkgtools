@@ -1,6 +1,6 @@
-#!/sbin/sh
+#!/bin/sh
 
-. /usr/bin/pkg
+. pkg
 
 pkg=icecat
 version=60.3.0
@@ -14,8 +14,10 @@ source="https://ftp.gnu.org/gnu/gnuzilla/60.3.0/icecat-60.3.0.en-US.gnulinux-x86
 mkdir -p /tmp/"$pkg"
 wget "$source"
 tar xf "$pkg"-"$version".en-US.gnulinux-x86_64.tar.bz2
+
 cd "$pkg"
 mv * /tmp/$pkg
 cd /tmp/"$pkg"
+
 mkpkg
 

@@ -1,0 +1,25 @@
+#!/bin/sh
+
+. pkg
+
+pkg=dash
+version="0.5.10.2"
+category=base
+arch="x86_64"
+basedir="/"
+pstamp="$version"
+name="Almquist Shell"
+source="http://gondor.apana.org.au/~herbert/dash/files/$pkg-$version.tar.gz"
+
+mkdir -p /tmp/$pkg
+
+wget "$source"
+/bin/tar xf "$pkg"-"$version".tar.gz
+
+cd "$pkg"-$version
+./configure --prefix=/ --mandir=/usr/share/man
+make
+make install DESTDIR=/tmp/$pkg
+
+mkpkg
+

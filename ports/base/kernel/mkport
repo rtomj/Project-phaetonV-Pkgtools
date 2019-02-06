@@ -1,4 +1,4 @@
-#!/sbin/sh
+#!/bin/sh
 
 . /usr/bin/pkg
 
@@ -26,6 +26,6 @@ make -j4 modules_install DESTDIR=/tmp/$pkg
 
 cp arch/x86/boot/bzImage /tmp/$pkg/boot/vmlinuz-$version
 cp System.map /tmp/$pkg/boot
-cd /tmp/"$pkg"
+
 mkpkg
 

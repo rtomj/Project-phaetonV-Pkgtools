@@ -1,4 +1,4 @@
-#!/usr/5bin/sh -e
+#!/bin/sh 
 
 . /usr/bin/pkg
 
@@ -13,8 +13,9 @@ name="traditional vi"
 
 wget $source
 tar xf $pkg-$version.tar.bz2
+
 cd "$pkg"-"$version"
 mkdir -p /tmp/$pkg
 make install DESTDIR=/tmp/$pkg
-cd /tmp/"$pkg"
+
 mkpkg

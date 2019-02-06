@@ -1,6 +1,6 @@
-#!/sbin/sh
+#!/bin/sh
 
-. /usr/bin/pkg
+. pkg
 
 pkg=help2man
 version=1.47.8
@@ -26,6 +26,5 @@ cd "$pkg"-$version
 make
 make DESTDIR=/tmp/"$pkg" install
 
-cd /tmp/"$pkg"
 mkpkg
 

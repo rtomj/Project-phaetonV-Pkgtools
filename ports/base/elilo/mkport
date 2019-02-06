@@ -1,4 +1,4 @@
-#!/sbin/sh
+#!/bin/sh
 
 . /usr/bin/pkg
 
@@ -30,5 +30,4 @@ cd elilo-$version-source
 
 cp tools/eliloalt /tmp/$pkg/usr/sbin
 
-cd /tmp/$pkg
 mkpkg

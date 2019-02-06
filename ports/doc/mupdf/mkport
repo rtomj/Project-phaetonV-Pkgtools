@@ -1,0 +1,26 @@
+#!/bin/sh
+
+. pkg
+
+pkg=mupdf
+version="1.14.0"
+category=doc
+arch="x86_64"
+basedir="/"
+pstamp="$version"
+name="pdf viewer"
+source="https://mupdf.com/downloads/archive/$pkg-$version-source.tar.xz"
+
+mkdir -p /tmp/"$pkg"
+
+wget "$source"
+
+/bin/tar xf "$pkg"-"$version"-source.tar.xz
+
+cd "$pkg"-$version-source
+
+make prefix=/usr/local mandir=/usr/local/share/man
+make prefix=/usr/local mandir=/usr/local/share/man DESTDIR=/tmp/$pkg install
+
+mkpkg
+

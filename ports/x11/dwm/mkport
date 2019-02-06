@@ -1,6 +1,6 @@
-#!/sbin/sh
+#!/bin/sh
 
-. /usr/bin/pkg
+. pkg
 
 pkg="dwm"
 version="6.1"
@@ -18,5 +18,5 @@ cd "$pkg"-"$version"
 
 make CC=gcc X11INC=/usr/include
 make DESTDIR=/tmp/"$pkg" PREFIX=/usr/local install
-cd /tmp/"$pkg"
+
 mkpkg

@@ -1,4 +1,4 @@
-#!/sbin/sh
+#!/bin/sh
 
 . /usr/bin/pkg
 
@@ -18,7 +18,6 @@ mkdir -p /tmp/"$pkg"
 cd "$pkg"-"$version"
 make
 make INSTALLROOT=/tmp/"$pkg" PREFIX=/usr/local install
-cd /tmp/"$pkg"
 mkpkg
 
 

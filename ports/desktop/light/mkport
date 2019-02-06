@@ -1,6 +1,6 @@
-#!/sbin/sh
+#!/bin/sh
 
-. /usr/bin/pkg
+. pkg
 
 pkg=light
 version="1.0"
@@ -23,6 +23,5 @@ cd "$pkg"-$version
 ./configure
 DESTDIR=/tmp/"$pkg" make install
 
-cd /tmp/"$pkg"
 mkpkg
 

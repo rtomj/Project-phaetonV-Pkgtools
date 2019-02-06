@@ -1,6 +1,6 @@
-#!/usr/5bin/sh -e
+#!/bin/sh
 
-. /usr/bin/pkg
+. pkg
 
 pkg=otawk
 version=20180827
@@ -13,9 +13,10 @@ name="one true awk"
 
 wget $source
 tar xf $version.tar.gz
+
 cd awk-"$version"
-mkdir /tmp/$pkg
+mkdir -p /tmp/$pkg
 make
 mv a.out /tmp/$pkg/otawk
-cd /tmp/"$pkg"
+
 mkpkg

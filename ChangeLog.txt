@@ -1,6 +1,6 @@
 dash 0.5.10.2
-dmenu 4.8
-dwm 6.1
+dmenu 4.9
+dwm 6.2
 elilo 3.16
 ex 050325
 gnu-efi 3.0.9
@@ -15,6 +15,6 @@ mupdf 1.14.0
 neofetch 6.0.0
 nvi 1.81.6
 otawk 20180827
-pkgtools 0.8.4
+pkgtools 0.8.9
 ranger 1.9.2
 tcsh 6.20.00

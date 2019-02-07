@@ -1,0 +1,28 @@
+#!/bin/sh
+
+. pkg
+
+pkg=libvisual
+version="0.4.0"
+category=graphics
+arch="x86_64"
+basedir="/"
+pstamp="$version"
+name="library for audio plugins"
+source="http://downloads.sourceforge.net/project/$pkg/$pkg/$pkg-$version/$pkg-$version.tar.bz2"
+
+mkdir -p /tmp/$pkg
+
+wget "$source"
+tar xf "$pkg"-"$version".tar.bz2
+
+cd "$pkg"-$version
+./configure \
+	--prefix=/usr/local \
+	--enable-extra-optimization
+make
+make DESTDIR=/tmp/$pkg install
+
+
+mkpkg
+

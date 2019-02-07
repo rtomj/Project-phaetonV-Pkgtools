@@ -1,0 +1,29 @@
+#!/bin/sh
+
+. pkg
+
+pkg=flac
+version="1.3.2"
+category=audio
+arch="x86_64"
+basedir="/"
+pstamp="$version"
+name="Free Lossless Audio Codec"
+source="http://downloads.xiph.org/releases/flac/$pkg-$version.tar.xz"
+deps="audio/libogg"
+
+mkdep
+mkdir -p /tmp/$pkg
+
+wget "$source"
+/bin/tar xf "$pkg"-"$version".tar.xz
+
+cd "$pkg"-$version
+
+./configure --prefix=/usr/local
+make
+make DESTDIR=/tmp/$pkg install
+rm -r /tmp/$pkg/usr/local/share/doc
+
+mkpkg
+

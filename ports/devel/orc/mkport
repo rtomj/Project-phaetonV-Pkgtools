@@ -1,0 +1,26 @@
+#!/bin/sh
+
+. pkg
+
+pkg=orc
+version="0.4.27"
+category=devel
+arch="x86_64"
+basedir="/"
+pstamp="$version"
+name="Oil Runtime Compiler"
+source="http://gstreamer.freedesktop.org/src/$pkg/$pkg-$version.tar.xz"
+
+mkdir -p /tmp/$pkg
+
+wget "$source"
+/bin/tar xf "$pkg"-"$version".tar.xz
+
+cd "$pkg"-$version
+
+./configure --prefix=/usr/local
+make
+make DESTDIR=/tmp/$pkg install
+
+mkpkg
+

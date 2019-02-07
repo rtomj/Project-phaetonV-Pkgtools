@@ -1,0 +1,29 @@
+#!/bin/sh
+
+. pkg
+
+pkg=libgudev
+version="232"
+category=devel
+arch="x86_64"
+basedir="/"
+pstamp="$version"
+name="GIbject bindings"
+source="https://ftp.gnome.org/pub/gnome/sources/$pkg/$version/$pkg-$version.tar.xz"
+mkdir -p /tmp/$pkg
+
+wget "$source"
+/bin/tar xf "$pkg"-"$version".tar.xz
+
+cd "$pkg"-$version
+
+./configure \
+	--prefix=/usr/local \
+	--disable-umockdev
+
+#sed -i 's/ -shared / -Wl,-O1,--as-needed\0/g' -i libtool
+make
+make install DESTDIR=/tmp/$pkg
+
+mkpkg
+

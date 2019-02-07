@@ -1,0 +1,26 @@
+#!/bin/sh
+
+. pkg
+
+pkg=cdparanoia
+version="10.2"
+category=audio
+arch="x86_64"
+basedir="/"
+pstamp="$version"
+name="CDDA extraction tool"
+source="http://downloads.xiph.org/releases/$pkg/$pkg-III-$version.src.tgz"
+
+mkdir -p /tmp/$pkg
+
+wget "$source"
+tar xf "$pkg"-III-"$version".src.tgz
+
+cd "$pkg"-III-$version
+
+./configure --prefix=/usr/local
+make -j1
+make prefix=/tmp/$pkg/usr/local MANDIR=/tmp/$pkg/usr/local/share/man install
+
+mkpkg
+

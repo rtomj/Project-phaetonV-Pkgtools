@@ -1,0 +1,32 @@
+#!/bin/sh
+
+. pkg
+
+pkg=opus
+version="1.2.1"
+category=audio
+arch="x86_64"
+basedir="/"
+pstamp="$version"
+name="opus codec"
+source="https://downloads.us.xiph.org/releases/$pkg/$pkg-$version.tar.gz"
+
+mkdir -p /tmp/$pkg
+
+wget "$source"
+/bin/tar xf "$pkg"-"$version".tar.gz
+
+cd "$pkg"-$version
+
+./configure \
+	--prefix=/usr/local \
+	--enable-custom-modes \
+	--enable-intrinsics \
+	--enable-rtcd \
+	--enable-ambisonics \
+	--disable-nls
+make
+make DESTDIR=/tmp/$pkg install
+
+mkpkg
+

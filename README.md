@@ -1,6 +1,6 @@
-### Project-Phaeton
+### Project-phaetonV
 Package manager/frontend for the Heirloom SVR4 packaging tools.
-This project was tested on CRUX 3.4.
+This project was tested on CRUX 3.4 with all core, opt, and xorg ports installed.
 
 #### Installation
 * Install [Heirloom Tools](http://heirloom.sourceforge.net/) and add to `$PATH`

@@ -1,0 +1,29 @@
+#!/bin/sh
+
+. pkg
+
+pkg=libjpeg-turbo
+version="2.0.1"
+category=graphics
+arch="x86_64"
+basedir="/"
+pstamp="$version"
+name="JPEG support functions"
+source="http://downloads.sourceforge.net/$pkg/$pkg-$version.tar.gz"
+
+mkdir -p /tmp/$pkg
+
+wget "$source"
+tar xf "$pkg"-"$version".tar.gz
+
+cd "$pkg"-$version
+
+cmake -G"Unix Makefiles" \
+	-DCMAKE_INSTALL_PREFIX=/usr/local \
+	-DCMAKE_INSTALL_LIBDIR=/usr/local/lib \
+	-DWITH_JPEG8=ON
+make
+make DESTDIR=/tmp/$pkg install
+
+mkpkg
+

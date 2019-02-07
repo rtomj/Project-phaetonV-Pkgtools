@@ -3,18 +3,18 @@
 . pkg
 
 pkg=pkgtools
-version=0.8.4
+version=0.8.9
 category=base
 arch="x86_64"
-basedir="/usr/bin"
+basedir="/"
 pstamp="$version"
 name="frontend for heirloom SVR4 pkgtools"
 
 
 mkdir -p /tmp/"$pkg"
 cd "$pkg"
-cp pkg /tmp/"$pkg"
-cp pkgbuild /tmp/"$pkg"
+install -c pkg /tmp/"$pkg"/usr/bin/pkg
+install -c pkgbuild /tmp/"$pkg"/usr/bin/pkgbuild
 
 mkpkg
 

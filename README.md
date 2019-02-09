@@ -3,32 +3,37 @@ Package manager/frontend for the Heirloom SVR4 packaging tools.
 This project was tested on CRUX 3.4 with all core, opt, and xorg ports installed.
 
 #### Installation
-* Install [Heirloom Tools](http://heirloom.sourceforge.net/) and add to `$PATH`
+* Install the [Heirloom Tools](http://heirloom.sourceforge.net/) and add to `$PATH`
 * Make sure heirloom sh is installed to /sbin/sh
-* Use `bin/pkg` as a bootstrap to install `base/pkgtools`
+* Create the pkg directory: `mkdir -p /var/spool/pkg`
+* Edit `/var/sadm/install/admin/default` and change `instance` to `instance=overwrite`
+* Use `bin/pkg` or `heirloom-pkg` as a bootstrap to install `base/pkgtools`
 
 ##### Usage
 ##### 1) Get the ports tree 
 
 `ports fetch`
 
-* Downloads `ports.tar.gz` and extracts it to `/usr/ports/`
+* Downloads `ports.tar.gz` and extracts it to `/usr/ports/` [TODO]
 * The file hierarchy is the same as on FreeBSD: `/usr/ports/category/port/`
 * Each port has a `mkport` which is similiar to Slackware's SlackBuilds or CRUX's Pkgfiles
 
-##### 2) Building a port
+##### 2) Creating a `mkport`
+* See the sample-mkports in `bin` and `heirloom-bin`
 
-`cd /usr/ports/x11/dmenu`
+##### 3) Building a port
+
+`cd /usr/ports/category/port`
 
 `./mkport`
 
-* This will create a `dmenu-$VERSION.pkg` in `/var/spool/pkg`
-* You can also use `pkgbuild category/port`
+* This will create a `port-$VERSION.pkg` in `/var/spool/pkg`
+* You can also use `pkgbuild` or `heirloom-pkgbuild`. 
 
-`pkgbuild x11/dmenu`
+`pkgbuild category/port`
 
 ##### 3) Installing a port or package
-* Install the created package. 
+* Install the created package with `pkg` or `heirloom-pkg` 
 
 `pkg install dmenu`
 
@@ -39,8 +44,8 @@ This project was tested on CRUX 3.4 with all core, opt, and xorg ports installed
 
 `pkg update dmenu`
 
+
 ##### TODO:
-* Create a POSIX version with Schily Bourne Shell or Ash/dash 
 * Create a SQLite `/var/db/pkg/ports.sqlite` database for ports like FreeBSD? 
 * some things could probably be written better
 * make `mkport` files for more programs and  create a repo

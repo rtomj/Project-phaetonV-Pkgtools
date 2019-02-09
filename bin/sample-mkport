@@ -1,0 +1,38 @@
+#!/bin/sh
+
+. pkg
+
+# Sample mkport with dependencies 
+
+# Variables - used to create pkginfo file for pkgmk
+pkg="program"
+version="1"
+category="system"
+arch="x86_64"
+# adjust if needed
+basedir="/"
+pstamp="$version"
+name="sample mkport"
+source="https://urlofsourcecode.com/program-1.tar.gz"
+# category/port
+deps="system/dep1 system/dep2 base/dep3 base/dep4"
+
+mkdep
+# Make tmp directory
+mkdir -p /tmp/"$pkg"
+
+wget "$source"
+
+tar xf "$pkg"-"$1".tar.gz
+
+cd "$pkg"
+
+# prefix=/usr/local should be the default prefix with many programs but use it anyway
+./configure --prefix=/usr/local
+make
+DESTDIR=/tmp/"$pkg" make install
+
+# Pkgmk creates the package using the generated pkginfo and prototype files.
+mkpkg
+# /var/spool/pkg/program-1.pkg is created with pkgtrans and can be installed with
+# pkg -i program or pkg install program

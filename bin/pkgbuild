@@ -4,7 +4,7 @@
 ## pkgbuild builds ports from their mkport files
 ##
 
-. /usr/bin/pkg
+. pkg
 
 usage() {
 	echo "usage: pkgbuild category/port"

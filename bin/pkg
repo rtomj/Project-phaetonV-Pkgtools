@@ -2,7 +2,7 @@
 
 ##
 ## pkg: SVR4 package tools wrapper
-##      Uses Schily POSIX Bourne Shell
+##
 
 ## pkgtools
 pkg_add="/usr/5bin/pkgadd -d"
@@ -18,15 +18,17 @@ pkg_loc="/var/spool/pkg"
 ports_loc="/usr/ports/"
 port_loc="/usr/ports/"$category"/"$pkg""
 conf_loc="/etc/pkg"
+
 ##
 ## packaging functions
 ##
+
 chpkg() {
 	#echo "===> Checking package"
 	if [ -f "$pkg_loc"/"$pkg"-"$version".pkg ]
 	then
         echo "======================================================================="
-		/usr/ucb/echo "===> "$pkg_loc"/"$pkg"-"$version".pkg successfully created"
+		echo "===> "$pkg_loc"/"$pkg"-"$version".pkg successfully created"
         echo "======================================================================="
     fi
 }
@@ -35,26 +37,29 @@ mkpkg() {
 	cd /tmp/$pkg
 	mkpkginfo
 	mkproto
-	/usr/ucb/echo "===> Creating package"
-    	/usr/5bin/pkgmk -o
-    	/usr/5bin/pkgtrans -s "$pkg_loc" "$pkg"-"$version".pkg "$pkg"
-    	/usr/5bin/rm -r "$pkg_loc"/"$pkg"
-    	/usr/5bin/rm -r /tmp/"$pkg"
+	echo "===> Creating package"
+    	$pkg_mk
+	$pkg_trans "$pkg_loc" "$pkg"-"$version".pkg "$pkg"
+    	rm -r "$pkg_loc"/"$pkg"
+    	rm -r /tmp/"$pkg"
 	chpkg
 }
 
 mkproto() {
-	/usr/ucb/echo "===> Creating prototype"
-	/usr/5bin/pkgproto -c "$category" .=. > prototype
+	echo "===> Creating prototype"
+	$pkg_proto "$category" .=. > prototype
 
-    # heirloom sed (derived from Solaris) has no -i option...
-    tmp=`mktemp prototype.XXXXXX`
-    /usr/5bin/sed '/=/!d' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && /usr/5bin/rm "$tmp"
-    # exclude pkginfo and prototype
-    /usr/5bin/sed '1d;2d;' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && /usr/5bin/rm "$tmp"
-    # newline
-    /usr/5bin/sed '1s/^/i pkginfo\
-    /' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && /usr/5bin/rm "$tmp"
+        # heirloom sed (derived from Solaris) has no -i option...
+        tmp=`mktemp prototype.XXXXXX`
+        sed '/=/!d' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
+
+        # exclude pkginfo and prototype
+        sed '1d;2d;' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
+
+        # newline
+        sed '1s/^/i pkginfo\
+        /' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
+	
 }
 
 mkpkginfo() {
@@ -68,56 +73,40 @@ mkpkginfo() {
 	echo "BASEDIR="$basedir"" >> pkginfo
 }
 
-extract() {
-	echo "===> Extracting archive"
-	case "$1" in
-		*.tar.bz2|*.tbz2|*.tbz)         tar xvjf "$1" ;;
-            	*.tgz)                          tar zxvf "$1" ;;
-            	*.tar.gz)                       tar xvzf "$1" ;;
-            	*.tar.xz)                       tar xvJf "$1" ;;
-            	*.tar)                          tar xvf "$1" ;;
-            	*.rar)                          7z x "$1" ;;
-            	*.zip)                          unzip "$1" ;;
-            	*.7z)                           7z x "$1" ;;
-            	*.lzo)                          lzop -d  "$1" ;;
-            	*.gz)                           gunzip "$1" ;;
-            	*.bz2)                          bunzip2 "$1" ;;
-            	*.Z)                            uncompress "$1" ;;
-            	*.xz|*.txz|*.lzma|*.tlz)        xz -d "$1" ;;
-            	*) echo "'$1' could not be decompressed." ;;
-        esac
+### Testing an automatic way to get source and setup for the build
+preproc() {
+        for i in $source
+        do
+                wget $i
+        done
+        mkdep
+        mkdir -p /tmp/$pkg
 }
 
-##
-## pkg functions
-##
-
 mkdep() {
-    echo "===> Checking dependencies for $pkg"
-    for i in $deps
-    do
-        echo "===> Checking dependencies for $i"
-        a=`echo $i | awk -F '/' '{print $2}'`
-        d=`/usr/5bin/pkginfo | grep -c $a`
-        if [ $d = 0 ]
-        then
-            echo "======================================================================="
-            echo "===> Building $i"
-            echo "======================================================================="
-            pkgbuild $i
-        else
-            echo "===> $a is already installed"
-        fi
-    done
+	echo "===> Checking dependencies for $pkg"
+	for i in $deps; do
+	#echo "$deps" | tr ' ' '\n' | while read i; do
+        	echo "===> Checking dependencies for $i"
+        	a=`echo $i | awk -F '/' '{print $2}'`
+	        d=`/usr/5bin/pkginfo | grep -c $a`
+        	if [ $d = 0 ]
+        	then
+            		echo "======================================================================="
+            		echo "===> Building $i"
+            		echo "======================================================================="
+            		pkgbuild $i
+        	else
+           	echo "===> $a is already installed"
+        	fi
+    	done
 }
 
 
 update() {
     echo "===> Checking ChangeLog.txt"
-    #echo "1=$1"
-    #echo "2=$2"
-    old=`/usr/5bin/pkginfo -x $1 | /usr/5bin/awk 'NR==2{print $2}'`
-    new=`/usr/5bin/grep $1 "$conf_loc"/ChangeLog.txt | /usr/5bin/awk '{print $2}'`
+    old=`$pkg_ck -x $1 | awk 'NR==2{print $2}'`
+    new=`grep $1 "$conf_loc"/ChangeLog.txt | awk '{print $2}'`
     if [ $old = $new ]
     then
         echo ""$1"-"$old".pkg is the latest version"
@@ -127,10 +116,11 @@ update() {
         read answer
         if [ $answer = y ]; then
             echo "===> Removing old package"
-            /usr/5bin/pkgrm -n "$1"
+            $pkg_rm -n "$1"
             echo "===> Upgrading package"
-            ver=`ls "$pkg_loc" | /usr/5bin/grep $1 | /usr/5bin/tail -n1`
-            /usr/5bin/pkgadd -d $pkg_loc/"$ver"
+	    # maybe call pkgbuild?	
+            ver=`ls "$pkg_loc" | $grep $1 | $tail -n1`
+            $pkg_add $pkg_loc/"$ver"
         elif [ $answer = n ]; then
             exit 1
         fi
@@ -138,7 +128,7 @@ update() {
 }
 
 envir() {
-num=`ls $pkg_loc | /usr/5bin/grep pkg | wc -l`
+num=`ls $pkg_loc | grep pkg | wc -l`
 inum=`$pkg_ck | wc -l`
 echo "
 No. of Stream Packages (*.pkg) in cache: "$num"
@@ -174,7 +164,7 @@ help    (-h)  - outputs this message"
 case "$1" in
 	install*|-i*|update*|-u*|remove*|-r*|delete*|-d*|sync*|-sy*)
         # using heirloom tools to check for root
-    	id=`id | /usr/5bin/awk -F'=' '{print $2}' | /usr/5bin/awk -F'(' '{print $1}'`
+    	id=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
         if [ "$id" != 0 ]
         then
         	echo "You must be root"
@@ -186,14 +176,14 @@ case "$1" in
 				if [ -n "$2" ]
 				then
 					pack=$2
-                                        ver=`ls "$pkg_loc" | /usr/5bin/s42/grep "\<$pack\>" | /usr/5bin/tail -n1`
+                                        ver=`ls "$pkg_loc" | "grep" "\<$pack\>" | tail -n1`
 					if [ -z "$ver" ]
 					then
 						echo "Package not found"
 						exit 1
 					elif [ -n "$ver" ]
 					then
-						/usr/5bin/pkgadd -d "$pkg_loc"/"$ver"
+						$pkg_add "$pkg_loc"/"$ver"
 					fi
 				else
 					echo "You must specify a package name"
@@ -207,7 +197,7 @@ case "$1" in
 				"$pkg_rm" "$2"
 			;;
             		delete*|-d*)
-            			/usr/5bin/rm "$pkg_loc"/"$2"-*.pkg
+            			rm "$pkg_loc"/"$2"-*.pkg
             		;;
             		sync*|-sy*)
             			echo "TODO"
@@ -238,6 +228,6 @@ case "$1" in
 	envir
     	;;
     	ver*|-v*)
-    	/usr/5bin/pkginfo -x pkgtools
+    	$pkg_ck -x pkgtools
     	;;
 esac

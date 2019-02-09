@@ -1,15 +1,15 @@
 #!/sbin/sh
 
-. /usr/bin/pkg
+. /usr/bin/heirloom-pkg
 
 #
-# ports utility
+# ports utility - unfinished
 #
 
 # Move this to a config file... or pkg?
 archive="https://github.com/rtomj/Project-Phaeton/blob/master/ports.tar.gz?raw=true"
 
-id=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
+id=`id | $awk -F'=' '{print $2}' | $awk -F'(' '{print $1}'`
 
 usage() {
     echo "usage: ports fetch|update(?)|sync(?)"

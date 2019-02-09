@@ -1,6 +1,6 @@
 #!/sbin/sh
 
-. /usr/bin/pkg
+. heirloom-pkg
 
 # Sample mkport with dependencies using heirloom sh and tools
 
@@ -17,20 +17,14 @@ source="https://urlofsourcecode.com/program-1.tar.gz"
 # category/port
 deps="system/dep1 system/dep2 base/dep3 base/dep4"
 
-# This will build all dependencies if they are not currently installed.
-# If those have dependencies they will be built as well.
 mkdep
-
 # Make tmp directory
 mkdir -p /tmp/"$pkg"
 
-# Get source
 wget "$source"
 
-# Extract it
 tar xf "$pkg"-"$1".tar.gz
 
-# Cd to archive
 cd "$pkg"
 
 # prefix=/usr/local should be the default prefix with many programs but use it anyway

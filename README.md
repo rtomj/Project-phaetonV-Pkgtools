@@ -46,6 +46,7 @@ This project was tested on CRUX 3.4 with all core, opt, and xorg ports installed
 
 
 ##### TODO:
+* Rewrite `bin/pkg` and `bin/pkgbuild` to use newer tools and functions
 * Create a SQLite `/var/db/pkg/ports.sqlite` database for ports like FreeBSD? 
 * some things could probably be written better
 * make `mkport` files for more programs and  create a separate ports repo?

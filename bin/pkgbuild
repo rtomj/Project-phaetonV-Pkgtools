@@ -10,6 +10,8 @@ usage() {
 	echo "usage: pkgbuild category/port"
 }
 
+# heirloom tools to check for root. 
+# will be changed later
 id=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
 if [ "$id" != 0 ]
 then

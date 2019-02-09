@@ -1,0 +1,35 @@
+#!/bin/sh
+
+. pkg
+
+pkg=libsamplerate
+version="0.1.9"
+category=audio
+arch="x86_64"
+basedir="/"
+pstamp="$version"
+name="sound sample rate conversion library"
+source="http://www.mega-nerd.com/SRC/$pkg-$version.tar.gz"
+deps="audio/libsndfile"
+
+mkdep
+mkdir -p $pkgtmp
+
+wget "$source"
+tar xf "$pkg"-"$version".tar.gz
+
+cd "$pkg"-$version
+
+./configure \
+	--prefix=/usr/local \
+	--disable-gcc-pipe \
+	--disable-dependency-tracking
+
+make
+make DESTDIR=/tmp/$pkg install
+
+rm -r /tmp/$pkg/usr/local/share/doc
+rmdir /tmp/$pkg/usr/local/share
+
+mkpkg
+

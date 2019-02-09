@@ -1,0 +1,49 @@
+#!/bin/sh
+
+. pkg
+
+pkg=python
+version="2.7.15"
+category=lang
+arch="x86_64"
+basedir="/"
+pstamp="$version"
+name="Python interpreter"
+source="http://www.python.org/ftp/$pkg/$version/Python-$version.tar.xz"
+#deps=""
+
+mkdir -p /tmp/$pkg
+
+wget "$source"
+tar xf Python-"$version".tar.xz
+
+cd Python-$version
+
+OPT="-Wall -Wstrict-prototypes -fwrapv" \
+./configure --prefix=/usr/local \
+	--enable-shared \
+	--with-threads \
+	--enable-ipv6 
+
+make 
+make -j4 DESTDIR=/tmp/$pkg install
+
+# fix issue with man-page symlink
+ln -sf python2.7.1 /tmp/$pkg/usr/share//man/man1/python.1
+
+ln -sf python2.7 /tmp/$pkg/usr/loca/bin/python
+ln -s python2.7 /tmp/$pkg/usr/local/lib/python
+ln -s python2.7 /tmp/$pkg/usr/local/include/python
+ln -s /usr/local/lib/libpython2.7.so /tmp/$pkg/usr/local/lib/python2.7/config/libpython2.7.so
+
+rm -r /tmp/$pkg/usr/local/lib/python/{bsddb,ctypes,email,sqlite3}/test
+rm -r /tmp/$pkg/usr/local/lib/python/{distutils,json,lib2to3}/tests
+rm /tmp/$pkg/usr/local/lib/python/{distutils,site-packages,test/data}/README
+rm /tmp/$pkg/usr/local/lib/python/idlelib/{ChangeLog,{NEWS,README,TODO}.txt}
+rm /tmp/$pkg/usr/local/lib/python/ctypes/macholib/README.ctypes
+
+mv /tmp/$pkg/usr/local/include/python2.7/pyconfig{,-64}.h
+install -m 0644 pyconfig.h /tmp/$pkg/usr/local/include/python2.7/
+
+mkpkg
+

@@ -1,0 +1,26 @@
+#!/bin/sh
+
+. pkg
+
+pkg=scons
+version="3.0.1"
+category=devel
+arch="x86_64"
+basedir="/"
+pstamp="$version"
+name="software construction tool"
+source="https://download.sourceforge.net/$pkg/$pkg-$version.tar.gz"
+deps="lang/python"
+
+mkdir -p /tmp/$pkg
+
+wget "$source"
+tar xf "$pkg"-"$version".tar.gz
+
+cd "$pkg"-$version
+
+/usr/bin/python setup.py build
+/usr/bin/python setup.py install --root=/tmp/$pkg/ --optimize=1 \
+	--install-data=/usr/share
+mkpkg
+

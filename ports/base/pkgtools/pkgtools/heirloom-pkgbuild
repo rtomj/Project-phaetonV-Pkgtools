@@ -1,0 +1,27 @@
+#!/sbin/sh
+
+##
+## pkgbuild builds ports from their mkport files
+## uses heirloom sh
+
+. /usr/bin/heirloom-pkg
+
+usage() {
+	echo "usage: heirloom-pkgbuild category/port"
+}
+
+id=`id | $awk -F'=' '{print $2}' | $awk -F'(' '{print $1}'`
+if [ "$id" != 0 ]
+then
+	echo "You must be root"
+	exit 1
+elif [ "$id" = 0 ]
+then
+	cd "$ports_loc""$1"
+	./mkport
+	pack=` echo "$1" | $awk -F'/' '{print $2}'`
+	/usr/bin/heirloom-pkg -i $pack
+else
+        usage
+fi
+

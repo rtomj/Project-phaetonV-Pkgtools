@@ -1,0 +1,31 @@
+#!/bin/sh 
+
+. pkg
+
+pkg=jack
+version="1.9.12"
+category=audio
+arch="x86_64"
+basedir="/"
+pstamp="$version"
+name="low-latency audio daemon"
+source="https://github.com/jackaudio/jack2/archive/v$version.tar.gz"
+deps="audio/libsamplerate lang/python"
+
+mkdep
+mkdir -p /tmp/$pkg
+
+wget "$source"
+tar xf v$version.tar.gz
+
+cd jack2-$version
+
+./waf configure \
+	--prefix=/usr/local \
+	--alsa
+
+./waf build -j4
+./waf install --destdir=/tmp/$pkg
+
+mkpkg
+

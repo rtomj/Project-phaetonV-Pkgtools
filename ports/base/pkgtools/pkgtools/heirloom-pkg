@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/sbin/sh
 
 ##
 ## pkg: SVR4 package tools wrapper
-##
+##	uses heirloom sh 
 
 ## pkgtools
 pkg_add="/usr/5bin/pkgadd -d"
@@ -18,6 +18,13 @@ pkg_loc="/var/spool/pkg"
 ports_loc="/usr/ports/"
 port_loc="/usr/ports/"$category"/"$pkg""
 conf_loc="/etc/pkg"
+
+## Force some heirloom tools just in case PATH is incorrect
+sed="/usr/5bin/sed"
+awk="/usr/5bin/awk"
+grep="/usr/5bin/grep"
+sgrep="/usr/5bin/s42/grep"
+tail="/usr/5bin/tail"
 
 ##
 ## packaging functions
@@ -49,17 +56,16 @@ mkproto() {
 	echo "===> Creating prototype"
 	$pkg_proto "$category" .=. > prototype
 
-        # heirloom sed (derived from Solaris) has no -i option...
-        tmp=`mktemp prototype.XXXXXX`
-        sed '/=/!d' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
-
-        # exclude pkginfo and prototype
-        sed '1d;2d;' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
-
-        # newline
-        sed '1s/^/i pkginfo\
-        /' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
+	# heirloom sed (derived from Solaris) has no -i option...
+	tmp=`mktemp prototype.XXXXXX`
+	$sed '/=/!d' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
 	
+	# exclude pkginfo and prototype
+	$sed '1d;2d;' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
+    
+	# newline
+	$sed '1s/^/i pkginfo\
+	/' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
 }
 
 mkpkginfo() {
@@ -84,29 +90,31 @@ preproc() {
 }
 
 mkdep() {
-	echo "===> Checking dependencies for $pkg"
-	for i in $deps; do
-	#echo "$deps" | tr ' ' '\n' | while read i; do
-        	echo "===> Checking dependencies for $i"
-        	a=`echo $i | awk -F '/' '{print $2}'`
-	        d=`/usr/5bin/pkginfo | grep -c $a`
-        	if [ $d = 0 ]
-        	then
-            		echo "======================================================================="
-            		echo "===> Building $i"
-            		echo "======================================================================="
-            		pkgbuild $i
-        	else
-           	echo "===> $a is already installed"
-        	fi
-    	done
+    echo "===> Checking dependencies for $pkg"
+    # array hack
+    set -- $deps
+    for i in $@
+    do
+        echo "===> Checking dependencies for $i"
+        a=`echo $i | /usr/5bin/awk -F'/' '{print $2}'`
+        d=`/usr/5bin/pkginfo | /usr/5bin/grep -c $a`
+        if [ $d = 0 ]
+        then
+            echo "======================================================================="
+            echo "===> Building $i"
+            echo "======================================================================="
+            pkgbuild $i
+        else
+            echo "===> $a is already installed"
+        fi
+    done
 }
 
 
 update() {
     echo "===> Checking ChangeLog.txt"
-    old=`$pkg_ck -x $1 | awk 'NR==2{print $2}'`
-    new=`grep $1 "$conf_loc"/ChangeLog.txt | awk '{print $2}'`
+    old=`$pkg_ck -x $1 | $awk 'NR==2{print $2}'`
+    new=`$grep $1 "$conf_loc"/ChangeLog.txt | $awk '{print $2}'`
     if [ $old = $new ]
     then
         echo ""$1"-"$old".pkg is the latest version"
@@ -128,7 +136,7 @@ update() {
 }
 
 envir() {
-num=`ls $pkg_loc | grep pkg | wc -l`
+num=`ls $pkg_loc | $grep pkg | wc -l`
 inum=`$pkg_ck | wc -l`
 echo "
 No. of Stream Packages (*.pkg) in cache: "$num"
@@ -164,7 +172,7 @@ help    (-h)  - outputs this message"
 case "$1" in
 	install*|-i*|update*|-u*|remove*|-r*|delete*|-d*|sync*|-sy*)
         # using heirloom tools to check for root
-    	id=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
+    	id=`id | $awk -F'=' '{print $2}' | $awk -F'(' '{print $1}'`
         if [ "$id" != 0 ]
         then
         	echo "You must be root"
@@ -176,7 +184,7 @@ case "$1" in
 				if [ -n "$2" ]
 				then
 					pack=$2
-                                        ver=`ls "$pkg_loc" | "grep" "\<$pack\>" | tail -n1`
+                                        ver=`ls "$pkg_loc" | "$grep" "\<$pack\>" | $tail -n1`
 					if [ -z "$ver" ]
 					then
 						echo "Package not found"

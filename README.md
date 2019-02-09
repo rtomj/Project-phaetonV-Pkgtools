@@ -4,7 +4,7 @@ This project was tested on CRUX 3.4 with all core, opt, and xorg ports installed
 
 #### Installation
 * Install the [Heirloom Tools](http://heirloom.sourceforge.net/) and add to `$PATH`
-* Make sure heirloom sh is installed to /sbin/sh
+* Make sure heirloom sh is installed to `/sbin/sh`
 * Create the pkg directory: `mkdir -p /var/spool/pkg`
 * Edit `/var/sadm/install/admin/default` and change `instance` to `instance=overwrite`
 * Use `bin/pkg` or `heirloom-pkg` as a bootstrap to install `base/pkgtools`
@@ -35,20 +35,20 @@ This project was tested on CRUX 3.4 with all core, opt, and xorg ports installed
 ##### 3) Installing a port or package
 * Install the created package with `pkg` or `heirloom-pkg` 
 
-`pkg install dmenu`
+`pkg install [port]`
 
 ##### 4) Updating a port or package
 `pkg sync`
 
 * Downloads the latest ChangeLog.txt [TODO]
 
-`pkg update dmenu`
+`pkg update [port]`
 
 
 ##### TODO:
 * Create a SQLite `/var/db/pkg/ports.sqlite` database for ports like FreeBSD? 
 * some things could probably be written better
-* make `mkport` files for more programs and  create a repo
+* make `mkport` files for more programs and  create a separate ports repo?
 * make `ports` download `ports.tar.gz` and extract to `/usr/ports`
 * implement `search`, `sync`, etc commands
 * Make an `update all` command

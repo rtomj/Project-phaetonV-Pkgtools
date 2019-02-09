@@ -88,7 +88,7 @@ mkdep() {
 	for i in $deps; do
 	#echo "$deps" | tr ' ' '\n' | while read i; do
         	echo "===> Checking dependencies for $i"
-        	a=`echo $i | awk -F '/' '{print $2}'`
+        	a=`echo $i | awk -F'/' '{print $2}'`
 	        d=`/usr/5bin/pkginfo | grep -c $a`
         	if [ $d = 0 ]
         	then

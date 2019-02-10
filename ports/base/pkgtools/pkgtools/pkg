@@ -46,6 +46,8 @@ mkpkg() {
 }
 
 mkproto() {
+	### rewrite this
+
 	echo "===> Creating prototype"
 	$pkg_proto "$category" .=. > prototype
 
@@ -88,9 +90,9 @@ mkdep() {
 	for i in $deps; do
 	#echo "$deps" | tr ' ' '\n' | while read i; do
         	echo "===> Checking dependencies for $i"
-        	a=`echo $i | awk -F '/' '{print $2}'`
-	        d=`/usr/5bin/pkginfo | grep -c $a`
-        	if [ $d = 0 ]
+		a=$(echo $i | awk -F'/' '{print $2}')
+		d=$(/usr/5bin/pkginfo | grep -c $a)
+        	if [ $d -eq 0 ]
         	then
             		echo "======================================================================="
             		echo "===> Building $i"
@@ -105,12 +107,12 @@ mkdep() {
 
 update() {
     echo "===> Checking ChangeLog.txt"
-    old=`$pkg_ck -x $1 | awk 'NR==2{print $2}'`
-    new=`grep $1 "$conf_loc"/ChangeLog.txt | awk '{print $2}'`
-    if [ $old = $new ]
+    old=$($pkg_ck -x $1 | awk 'NR==2{print $2}')
+    new=$(grep $1 "$conf_loc"/ChangeLog.txt | awk '{print $2}')
+    if [ $old -eq $new ]
     then
         echo ""$1"-"$old".pkg is the latest version"
-    elif [ $new > $old ]
+    elif [ $new -gt $old ]
     then
         echo "===> Upgrade "$1"-"$old" to "$1"-"$new" (y/n)?"
         read answer
@@ -119,7 +121,7 @@ update() {
             $pkg_rm -n "$1"
             echo "===> Upgrading package"
 	    # maybe call pkgbuild?	
-            ver=`ls "$pkg_loc" | $grep $1 | $tail -n1`
+	    ver=$(ls "$pkg_loc" | grep $1 | tail -n1)
             $pkg_add $pkg_loc/"$ver"
         elif [ $answer = n ]; then
             exit 1
@@ -127,9 +129,28 @@ update() {
     fi
 }
 
+install() {
+	if [ -n "$1" ]
+        then
+		pack=$1
+		ver=$(ls "$pkg_loc" | "grep" "\<$pack\>" | tail -n1)
+		if [ -z "$ver" ]
+		then
+			echo "Package not found"
+			exit 1
+		elif [ -n "$ver" ]
+		then
+			$pkg_add "$pkg_loc"/"$ver"
+		fi
+	else
+	echo "You must specify a package name"
+	exit 1
+fi
+}
+
 envir() {
-num=`ls $pkg_loc | grep pkg | wc -l`
-inum=`$pkg_ck | wc -l`
+	num=$(ls $pkg_loc | grep pkg | wc -l)
+	inum=$($pkg_ck | wc -l)
 echo "
 No. of Stream Packages (*.pkg) in cache: "$num"
 No. of Installed Packages:               "$inum"
@@ -163,44 +184,27 @@ help    (-h)  - outputs this message"
 ##
 case "$1" in
 	install*|-i*|update*|-u*|remove*|-r*|delete*|-d*|sync*|-sy*)
-        # using heirloom tools to check for root
-    	id=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
-        if [ "$id" != 0 ]
+	if [ "$(id -u)" -ne 0 ]
         then
         	echo "You must be root"
         	exit 1
-    	elif [ "$id" = 0 ]
+	elif [ "$(id -u)" -eq 0 ]
         then
 		case "$1" in
-			install*|-i*)
-				if [ -n "$2" ]
-				then
-					pack=$2
-                                        ver=`ls "$pkg_loc" | "grep" "\<$pack\>" | tail -n1`
-					if [ -z "$ver" ]
-					then
-						echo "Package not found"
-						exit 1
-					elif [ -n "$ver" ]
-					then
-						$pkg_add "$pkg_loc"/"$ver"
-					fi
-				else
-					echo "You must specify a package name"
-					exit 1
-				fi
-				;;
-            update*|-u*)
-            	update "$2"
-            		;;
-			remove*|-r*)
-				"$pkg_rm" "$2"
+		install*|-i*)
+			install $2
 			;;
-            		delete*|-d*)
-            			rm "$pkg_loc"/"$2"-*.pkg
+            	update*|-u*)
+            		update "$2"
             		;;
-            		sync*|-sy*)
-            			echo "TODO"
+		remove*|-r*)
+			"$pkg_rm" "$2"
+			;;
+            	delete*|-d*)
+            		rm "$pkg_loc"/"$2"-*.pkg
+            		;;
+            	sync*|-sy*)
+            		echo "TODO"
             		;;
 		esac
 	fi

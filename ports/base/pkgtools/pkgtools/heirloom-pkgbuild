@@ -4,13 +4,14 @@
 ## pkgbuild builds ports from their mkport files
 ## uses heirloom sh
 
-. /usr/bin/heirloom-pkg
+. heirloom-pkg
 
 usage() {
 	echo "usage: heirloom-pkgbuild category/port"
 }
 
 id=`id | $awk -F'=' '{print $2}' | $awk -F'(' '{print $1}'`
+#idcheck
 if [ "$id" != 0 ]
 then
 	echo "You must be root"

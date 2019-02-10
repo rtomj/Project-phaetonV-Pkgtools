@@ -14,7 +14,7 @@ source="http://gstreamer.freedesktop.org/src/$pkg/$pkg-$version.tar.xz"
 mkdir -p /tmp/$pkg
 
 wget "$source"
-/bin/tar xf "$pkg"-"$version".tar.xz
+xzcat "$pkg"-"$version".tar.xz | tar xf -
 
 cd "$pkg"-$version
 

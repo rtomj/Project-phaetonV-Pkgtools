@@ -14,7 +14,7 @@ source="http://downloads.xiph.org/releases/ogg/$pkg-$version.tar.xz"
 mkdir -p $pkgtmp
 
 wget "$source"
-/bin/tar xf "$pkg"-"$version".tar.xz
+xzcat $pkg-$version.tar.xz | tar xf -
 
 cd "$pkg"-$version
 

@@ -16,7 +16,7 @@ wget "$source"
 tar xf "$pkg"-"$version".en-US.gnulinux-x86_64.tar.bz2
 
 cd "$pkg"
-mv * /tmp/$pkg
+install -D /tmp/$pkg
 cd /tmp/"$pkg"
 
 mkpkg

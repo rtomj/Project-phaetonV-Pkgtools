@@ -14,8 +14,7 @@ source="http://ftp.gnu.org/gnu/help2man/help2man-1.47.8.tar.xz"
 mkdir -p /tmp/"$pkg"
 
 wget "$source"
-# heirloom tar doesn't work with tar xz files
-/bin/tar xJf "$pkg"-"$version".tar.xz
+xzcat "$pkg"-"$version".tar.xz | tar xf -
 
 cd "$pkg"-$version
 

@@ -15,7 +15,7 @@ mkdir -p /tmp/"$pkg"
 
 wget "$source"
 
-/bin/tar xf "$pkg"-"$version"-source.tar.xz
+xzcat "$pkg"-"$version"-source.tar.xz | tar xf -
 
 cd "$pkg"-$version-source
 

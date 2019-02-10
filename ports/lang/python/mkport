@@ -15,7 +15,7 @@ source="http://www.python.org/ftp/$pkg/$version/Python-$version.tar.xz"
 mkdir -p /tmp/$pkg
 
 wget "$source"
-tar xf Python-"$version".tar.xz
+xzcat Python-"$version".tar.xz | tar xf -
 
 cd Python-$version
 

@@ -17,8 +17,9 @@ mkdir -p /tmp/$pkg
 wget $source
 wget $source2
 
-/bin/tar xf llvm-$version.src.tar.xz
-/bin/tar xf cfe-$version.src.tar.xz
+xzcat llvm-$version.src.tar.xz | tar xf -
+xzcat cfe-$version.src.tar.xz | tar xf -
+
 mv cfe-$version.src llvm-$version.src/tools/clang
 cd llvm-$version.src
 mkdir build

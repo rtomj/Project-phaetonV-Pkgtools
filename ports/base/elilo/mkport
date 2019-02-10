@@ -19,8 +19,8 @@ wget "$source2"
 
 mkdir -p /tmp/$pkg/usr/sbin
 
-/bin/tar xJf elilo-$version-all.tar.xz
-/bin/tar xJf elilo.loader.binaries.tar.xz
+xzcat elilo-$version-all.tar.xz | tar xf -
+xzcat elilo.loader.binaries.tar.xz | tar xf -
 tar xf elilo-$version-source.tar.gz
 
 mkdir -p /tmp/$pkg/boot/efi/EFI/elilo

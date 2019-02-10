@@ -135,6 +135,25 @@ update() {
     fi
 }
 
+install() {
+	if [ -n "$1" ]
+	then
+		pack=$1
+		ver=`ls "$pkg_loc" | "$grep" "\<$pack\>" | $tail -n1`
+		if [ -z "$ver" ]
+		then
+			echo "Package not found"
+			exit 1
+		elif [ -n "$ver" ]
+		then
+			$pkg_add "$pkg_loc"/"$ver"
+		fi
+	else
+	echo "You must specify a package name"
+	exit 1
+fi
+}
+
 envir() {
 num=`ls $pkg_loc | $grep pkg | wc -l`
 inum=`$pkg_ck | wc -l`
@@ -195,35 +214,20 @@ case "$1" in
     	elif [ "$id" -eq 0 ]
         then
 		case "$1" in
-			install*|-i*)
-				if [ -n "$2" ]
-				then
-					pack=$2
-                                        ver=`ls "$pkg_loc" | "$grep" "\<$pack\>" | $tail -n1`
-					if [ -z "$ver" ]
-					then
-						echo "Package not found"
-						exit 1
-					elif [ -n "$ver" ]
-					then
-						$pkg_add "$pkg_loc"/"$ver"
-					fi
-				else
-					echo "You must specify a package name"
-					exit 1
-				fi
-				;;
-            update*|-u*)
-            	update "$2"
-            		;;
-			remove*|-r*)
-				"$pkg_rm" "$2"
+		install*|-i*)
+			install $2	
 			;;
-            		delete*|-d*)
-            			rm "$pkg_loc"/"$2"-*.pkg
+            	update*|-u*)
+            		update "$2"
             		;;
-            		sync*|-sy*)
-            			echo "TODO"
+		remove*|-r*)
+			"$pkg_rm" "$2"
+			;;
+            	delete*|-d*)
+            		rm "$pkg_loc"/"$2"-*.pkg
+            		;;
+            	sync*|-sy*)
+            		echo "TODO"
             		;;
 		esac
 	fi

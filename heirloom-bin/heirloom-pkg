@@ -98,7 +98,7 @@ mkdep() {
         echo "===> Checking dependencies for $i"
         a=`echo $i | /usr/5bin/awk -F'/' '{print $2}'`
         d=`/usr/5bin/pkginfo | /usr/5bin/grep -c $a`
-        if [ $d = 0 ]
+        if [ $d -ne 0 ]
         then
             echo "======================================================================="
             echo "===> Building $i"
@@ -115,10 +115,10 @@ update() {
     echo "===> Checking ChangeLog.txt"
     old=`$pkg_ck -x $1 | $awk 'NR==2{print $2}'`
     new=`$grep $1 "$conf_loc"/ChangeLog.txt | $awk '{print $2}'`
-    if [ $old = $new ]
+    if [ $old -eq $new ]
     then
         echo ""$1"-"$old".pkg is the latest version"
-    elif [ $new > $old ]
+    elif [ $new -gt $old ]
     then
         echo "===> Upgrade "$1"-"$old" to "$1"-"$new" (y/n)?"
         read answer
@@ -166,18 +166,33 @@ ver     (-v)  - check pkg version
 help    (-h)  - outputs this message"
 }
 
+idcheck() {
+	# Check for root using heirloom tools.
+	# /usr/5bin/id does not have a '-u' option
+	# /usr/5bin/posix/id does
+	i=`which id`
+	if [ $i -eq '/usr/5bin/posix/id' ]
+	then
+		echo "POSIX heirloom id"
+		id=`/usr/5bin/posix/id -u`
+	else
+		echo "Falling back to default"
+		# /usr/5bin/awk doesn't work with multiple field separators
+		id=`id | $awk -F'=' '{print $2}' | $awk -F'(' '{print $1}'`
+	fi
+}
+
 ##
 ## pkg
 ##
 case "$1" in
 	install*|-i*|update*|-u*|remove*|-r*|delete*|-d*|sync*|-sy*)
-        # using heirloom tools to check for root
     	id=`id | $awk -F'=' '{print $2}' | $awk -F'(' '{print $1}'`
-        if [ "$id" != 0 ]
+	if [ "$id" -ne 0 ]
         then
         	echo "You must be root"
         	exit 1
-    	elif [ "$id" = 0 ]
+    	elif [ "$id" -eq 0 ]
         then
 		case "$1" in
 			install*|-i*)

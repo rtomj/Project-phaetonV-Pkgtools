@@ -1,15 +1,13 @@
 #!/sbin/sh
-
+# Use heirloom sh and heirloom pkg
 . heirloom-pkg
-
-# Sample mkport with dependencies using heirloom sh and tools
 
 # Variables - used to create pkginfo file for pkgmk
 pkg="program"
 version="1"
 category="system"
 arch="x86_64"
-# adjust if needed
+# adjust if needed 
 basedir="/"
 pstamp="$version"
 name="sample mkport"
@@ -17,6 +15,7 @@ source="https://urlofsourcecode.com/program-1.tar.gz"
 # category/port
 deps="system/dep1 system/dep2 base/dep3 base/dep4"
 
+# make dependencies
 mkdep
 # Make tmp directory
 mkdir -p /tmp/"$pkg"

@@ -9,19 +9,17 @@
 # Move this to a config file... or pkg?
 archive="https://github.com/rtomj/Project-Phaeton/blob/master/ports.tar.gz?raw=true"
 
-id=`id | awk -F'=' '{print $2}' | awk -F'(' '{print $1}'`
-
 usage() {
     echo "usage: ports fetch|update(?)|sync(?)"
 }
 
 case "$1" in
     fetch*)
-        if [ "$id" != 0 ]
+	if [ "$(id -u)" != 0 ]
         then
             echo "You must be root"
             exit 1
-        elif [ "$id" = 0 ]
+    	elif [ "$(id -u)" = 0 ]
         then
             echo "===> Fetching ports archive"
             # download ports archive

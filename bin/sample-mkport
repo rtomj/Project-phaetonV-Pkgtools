@@ -2,8 +2,6 @@
 
 . pkg
 
-# Sample mkport with dependencies 
-
 # Variables - used to create pkginfo file for pkgmk
 pkg="program"
 version="1"
@@ -17,6 +15,7 @@ source="https://urlofsourcecode.com/program-1.tar.gz"
 # category/port
 deps="system/dep1 system/dep2 base/dep3 base/dep4"
 
+# make dependencies
 mkdep
 # Make tmp directory
 mkdir -p /tmp/"$pkg"

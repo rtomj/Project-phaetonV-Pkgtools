@@ -19,6 +19,12 @@ ports_loc="/usr/ports/"
 port_loc="/usr/ports/"$category"/"$pkg""
 conf_loc="/etc/pkg"
 
+## Configuration
+export CC=/usr/bin/clang
+export CXX=/usr/bin/clang++
+
+export MAKEFLAGS='-j4'
+
 ##
 ## packaging functions
 ##
@@ -129,7 +135,7 @@ update() {
     fi
 }
 
-install() {
+install_package() {
 	if [ -n "$1" ]
         then
 		pack=$1
@@ -192,7 +198,7 @@ case "$1" in
         then
 		case "$1" in
 		install*|-i*)
-			install $2
+			install_package $2
 			;;
             	update*|-u*)
             		update "$2"

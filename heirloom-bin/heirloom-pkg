@@ -26,6 +26,15 @@ grep="/usr/5bin/grep"
 sgrep="/usr/5bin/s42/grep"
 tail="/usr/5bin/tail"
 
+## Configuration
+CC=/usr/bin/clang
+export CC
+CXX=/usr/bin/clang++
+export CXX
+
+MAKEFLAGS='-j4'
+export MAKEFLAGS
+
 ##
 ## packaging functions
 ##
@@ -135,7 +144,7 @@ update() {
     fi
 }
 
-install() {
+install_package() {
 	if [ -n "$1" ]
 	then
 		pack=$1
@@ -215,7 +224,7 @@ case "$1" in
         then
 		case "$1" in
 		install*|-i*)
-			install $2	
+			install_package $2	
 			;;
             	update*|-u*)
             		update "$2"

@@ -25,6 +25,9 @@ export CXX=/usr/bin/clang++
 
 export MAKEFLAGS='-j4'
 
+## Ports mirror
+ports_archive="https://github.com/rtomj/phaetonV-ports/archive/ports.tar.gz"
+
 ##
 ## packaging functions
 ##
@@ -154,6 +157,20 @@ install_package() {
 fi
 }
 
+fetch_ports(){
+	## Rewrite - could use git, then updating is easy as git pull...
+	if [ ! -d /usr/ports ]
+	then
+	wget --directory /tmp "$ports_archive"
+	cd /tmp
+	tar xf ports.tar.gz --directory /usr
+	if [ -d /usr/ports ]
+	then
+		echo "/usr/ports/ already exists"
+	fi
+fi
+}
+
 envir() {
 	num=$(ls $pkg_loc | grep pkg | wc -l)
 	inum=$($pkg_ck | wc -l)
@@ -172,24 +189,25 @@ usage() {
 echo "usage: pkg [command] [argument]
 
 Available commands:
-search  (-s)  - searches the repository [TODO]
-install (-i)  - installs SVR4 package
-update  (-u)  - updates packages [TODO]
-remove  (-r)  - uninstalls a package but does not delete it from cache
-delete  (-d)  - deletes package from cache and system
-sync    (-sy) - sync with repository [TODO]
-list    (-l)  - list all installed packages
-verify  (-vf) - verify hashes of packages
-env     (-e)  - outputs pkg environment and package cache details
-ver     (-v)  - check pkg version
-help    (-h)  - outputs this message"
+search		(-s)  - searches the repository [TODO]
+fetch-ports	(-fp)  - fetch the ports collection [IN PROGRESS]
+install		(-i)  - installs SVR4 package
+update		(-u)  - updates packages [TODO]
+remove		(-r)  - uninstalls a package but does not delete it from cache
+delete		(-d)  - deletes package from cache and system
+sync		(-sy) - sync with repository [TODO]
+list		(-l)  - list all installed packages
+verify		(-vf) - verify hashes of packages
+env		(-e)  - outputs pkg environment and package cache details
+ver		(-v)  - check pkg version
+help		(-h)  - outputs this message"
 }
 
 ##
 ## pkg
 ##
 case "$1" in
-	install*|-i*|update*|-u*|remove*|-r*|delete*|-d*|sync*|-sy*)
+	install*|-i*|update*|-u*|remove*|-r*|delete*|-d*|sync*|-sy*|fetch-ports*|-fp*)
 	if [ "$(id -u)" -ne 0 ]
         then
         	echo "You must be root"
@@ -212,6 +230,9 @@ case "$1" in
             	sync*|-sy*)
             		echo "TODO"
             		;;
+		fetch-ports*|-fp*)
+			fetch_ports 
+			;;
 		esac
 	fi
 	;;
@@ -225,6 +246,8 @@ case "$1" in
     	usage
     	;;
     	verify*|-vf*)
+		## Change this to a separate function that compares the md5sum in a mkport to downloaded source
+		## or to verify repo credentials
 		if [ -z "$2" ]
 		then
 			echo "You must specify a package"

@@ -44,15 +44,15 @@ This project was tested on CRUX 3.4 with all core, opt, and xorg ports installed
 
 `pkg update [port]`
 
-
 ##### TODO:
-* Rewrite `bin/pkg` and `bin/pkgbuild` to use newer tools and functions
+* Rewrite `bin/pkgbuild` to use `makepkg`
+* Write an `heirloom-makepkg`
+* Rewrite `bin/pkg` and `heirloom-pkg` so they only manage packages and not build them
+* Fix checksum bug in `makepkg`
+* Instead of a `mkport`, use `port.mkport` 
+* Write a mkport generator
 * Create a SQLite `/var/db/pkg/ports.sqlite` database for ports like FreeBSD? 
 * some things could probably be written better
-* make `mkport` files for more programs and  create a separate ports repo?
-* make `ports` download `ports.tar.gz` and extract to `/usr/ports`
+* make `pkg fetch-ports` download `ports.tar.gz` and extract to `/usr/ports`
 * implement `search`, `sync`, etc commands
 * Make an `update all` command
-
-
-   

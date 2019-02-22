@@ -1,0 +1,136 @@
+#!/bin/bash -e
+
+#
+# Makepkg : packages programs into SVR4 package
+# 	    add to PATH
+# usage	  : makepkg [port].mkport
+
+# Info in *.mkport
+FILE="$1"
+info=("PKG=" "ARCH=" "CLASSES=" "BASEDIR=" "NAME=" "VERSION=" "CATEGORY=" "VENDOR=" "PKGSAV=" "SOURCE=" "SHA256SUM=")
+port_info=()
+
+## assign variables
+for i in ${info[@]}
+do
+	port_info+=( "$(cat $FILE | grep $i | awk -F'=' '{print $2}')" )
+done
+
+PKG="${port_info[0]}"
+ARCH="${port_info[1]}"
+NAME="${port_info[4]}"
+VERSION="${port_info[5]}"
+SOURCE="${port_info[9]}"
+SVR4PKG=""$PKG"-"$VERSION"-"$ARCH".pkg"
+archive=$(echo "${port_info[9]}" | awk -F'/' '{print $NF}')
+correct_checksum="${port_info[10]}"	
+archive_checksum=$(sha256sum "$archive" | awk '{print $1}')
+
+make_tmp_dir() {
+	mkdir -p /tmp/"$NAME"
+}
+
+get_source() {
+	echo "====> Downloading source archive"
+	wget "$SOURCE"
+}
+
+compare_checksums() {
+	echo "====> Source checksum "$correct_checksum""
+	echo "====> Archive checksum "$archive_checksum""
+	if [ "$archive_checksum" != "$correct_checksum" ]
+	then
+		echo "Warning: checksums do not match. Deleting source archive."
+		#rm $(pwd)/$archive
+		exit 1
+	elif [ "$archive_checksum" = "$correct_checksum" ]
+	then
+		echo "====> Verified archive checksum"
+	fi
+}
+
+# Build
+build_mkport() {
+	echo "====> Building from $(pwd)/"$FILE""
+	source "$FILE"
+	build
+}
+
+# Generate pkginfo
+generate_pkginfo(){
+	##touch $(pwd)/pkginfo
+	echo "====> Creating pkginfo for $(pwd)/"$FILE""
+
+	for i in "${info[@]}"
+	do
+		echo "$(cat "$FILE" | grep $i)" >> $(pwd)/pkginfo
+	done
+}
+ 
+# Generate prototype
+
+generate_proto() {
+	dest=/tmp/"$NAME"/
+
+	tmp_file=TMP_proto
+
+	## Generate tmp prototype
+	pkgproto "$dest"="$dest" > "$tmp_file"
+	
+	## Change groups and owners
+	sed -i -e 's/root/bin/g; 3d' "$tmp_file"
+
+	## fix file paths
+	awk -v awk_dest="$dest" '{sub(awk_dest, ""); print}' "$tmp_file" > prototype
+
+	## Remove directories to avoid 'unable to remove" error when uninstalling
+	sed -i '/=/!d' prototype
+
+	## Add pkginfo and default BASEDIR
+	sed -i '1s/^/i pkginfo\n!default 0755 root bin\n/' prototype
+	
+	rm "$tmp_file"
+}
+
+# Generate Package
+generate_package() {
+	# Suppress missing directory entry warnings 
+	pkgmk -o -d /tmp -a "$ARCH" 2>/dev/null
+	touch "$SVR4PKG"
+	pkgtrans -s /tmp "$SVR4PKG" "$PKG" 
+
+	echo "====================================================="
+	echo "====> "$SVR4PKG" created"
+	echo "====================================================="
+
+}
+
+cleanup(){
+	rm -r /tmp/"$NAME"
+	rm $(pwd)/"$archive"
+	rm -r /tmp/"$PKG"
+
+	# Don't delete /usr/5bin/pkginfo
+	if [ $(pwd) != "/usr/5bin/" ]
+	then
+		rm $(pwd)/prototype
+		rm $(pwd)/pkginfo
+	else
+		echo "Cannot delete pkginfo"
+	fi
+}
+
+#########################################
+main () {
+	make_tmp_dir
+	get_source
+	#compare_checksums
+	build_mkport
+	cd ..
+	generate_pkginfo
+	generate_proto
+	generate_package
+	cleanup
+}
+
+main

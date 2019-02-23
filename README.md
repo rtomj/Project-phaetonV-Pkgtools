@@ -22,20 +22,21 @@ This project was tested on CRUX 3.4 with all core, opt, and xorg ports installed
 * See the sample-mkports in `bin` and `heirloom-bin`
 
 ##### 3) Building a port
+* Use `makepkg` or `heirloom-makepkg`
 
 `cd /usr/ports/category/port`
 
 `makepkg port.mkport`
 
 * This will create an `SVR4port-$VERSION-$ARCH.pkg` in `/var/spool/pkg`
-* You can also use `pkgbuild` or `heirloom-pkgbuild`. 
+* You can also use `pkgbuild` or `heirloom-pkgbuild` from any directory. 
 
 `pkgbuild category/port`
 
 ##### 3) Installing a port or package
-* Install the created package with `pkg` or `heirloom-pkg` 
+* Install the created package with `pkg`, `heirloom-pkg`, or `pkgadd -d /path/to/SVR4port-version-arch.pkg` 
 
-`pkg install [port]`
+`pkg -i/install [port]`
 
 ##### 4) Updating a port or package
 `pkg sync`
@@ -45,7 +46,7 @@ This project was tested on CRUX 3.4 with all core, opt, and xorg ports installed
 `pkg update [port]`
 
 ##### TODO:
-* Write an `heirloom-makepkg`
+* Write an `heirloom-makepkg` [DONE]
 * Fix checksum bug in `makepkg`
 * Instead of a `mkport`, use `port.mkport` 
 * Write a mkport generator

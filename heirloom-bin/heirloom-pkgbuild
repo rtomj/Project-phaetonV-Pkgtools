@@ -21,7 +21,7 @@ then
 	port=`echo "$1" | $awk -F'/' '{print $NF}'`
 	cd "$ports_loc"/"$1"
 	makepkg "$port".mkport
-	/usr/bin/heirloom-pkg -i "$port"
+	/usr/bin/heirloom-pkg -i SVR4"$port"
 else
         usage
 fi

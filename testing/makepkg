@@ -79,7 +79,8 @@ generate_proto() {
 	pkgproto "$dest"="$dest" > "$tmp_file"
 	
 	## Change groups and owners
-	sed -i -e 's/root/bin/g; 3d' "$tmp_file"
+	# This could cause issues... 
+	# sed -i -e 's/root/bin/g; 3d' "$tmp_file"
 
 	## fix file paths
 	awk -v awk_dest="$dest" '{sub(awk_dest, ""); print}' "$tmp_file" > prototype

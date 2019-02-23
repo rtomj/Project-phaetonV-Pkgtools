@@ -26,6 +26,7 @@ archive=$(echo "${port_info[9]}" | awk -F'/' '{print $NF}')
 correct_checksum="${port_info[10]}"	
 archive_checksum=$(sha256sum "$archive" | awk '{print $1}')
 
+
 make_tmp_dir() {
 	mkdir -p /tmp/"$NAME"
 }
@@ -121,6 +122,7 @@ cleanup(){
 }
 
 #########################################
+# Add case statement that lets user choose what functions to run
 main () {
 	make_tmp_dir
 	get_source

@@ -19,101 +19,6 @@ ports_loc="/usr/ports/"
 port_loc="/usr/ports/"$category"/"$pkg""
 conf_loc="/etc/pkg"
 
-## Configuration
-export CC=/usr/bin/clang
-export CXX=/usr/bin/clang++
-
-export MAKEFLAGS='-j4'
-
-## Ports mirror
-ports_archive="https://github.com/rtomj/phaetonV-ports/archive/ports.tar.gz"
-
-##
-## packaging functions
-##
-
-chpkg() {
-	#echo "===> Checking package"
-	if [ -f "$pkg_loc"/"$pkg"-"$version".pkg ]
-	then
-        echo "======================================================================="
-		echo "===> "$pkg_loc"/"$pkg"-"$version".pkg successfully created"
-        echo "======================================================================="
-    fi
-}
-
-mkpkg() {
-	cd /tmp/$pkg
-	mkpkginfo
-	mkproto
-	echo "===> Creating package"
-    	$pkg_mk
-	$pkg_trans "$pkg_loc" "$pkg"-"$version".pkg "$pkg"
-    	rm -r "$pkg_loc"/"$pkg"
-    	rm -r /tmp/"$pkg"
-	chpkg
-}
-
-mkproto() {
-	### rewrite this
-
-	echo "===> Creating prototype"
-	$pkg_proto "$category" .=. > prototype
-
-        # heirloom sed (derived from Solaris) has no -i option...
-        tmp=`mktemp prototype.XXXXXX`
-        sed '/=/!d' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
-
-        # exclude pkginfo and prototype
-        sed '1d;2d;' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
-
-        # newline
-        sed '1s/^/i pkginfo\
-        /' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
-	
-}
-
-mkpkginfo() {
-	echo "===> Creating pkginfo"
-	echo "PKG="$pkg"" >> pkginfo
-	echo "NAME="$name"" >> pkginfo
-	echo "VERSION="$version"" >> pkginfo
-	echo "ARCH="$arch"" >> pkginfo
-	echo "CATEGORY="$category"" >> pkginfo
-	echo "PSTAMP="$version"" >> pkginfo
-	echo "BASEDIR="$basedir"" >> pkginfo
-}
-
-### Testing an automatic way to get source and setup for the build
-preproc() {
-        for i in $source
-        do
-                wget $i
-        done
-        mkdep
-        mkdir -p /tmp/$pkg
-}
-
-mkdep() {
-	echo "===> Checking dependencies for $pkg"
-	for i in $deps; do
-	#echo "$deps" | tr ' ' '\n' | while read i; do
-        	echo "===> Checking dependencies for $i"
-		a=$(echo $i | awk -F'/' '{print $2}')
-		d=$(/usr/5bin/pkginfo | grep -c $a)
-        	if [ $d -eq 0 ]
-        	then
-            		echo "======================================================================="
-            		echo "===> Building $i"
-            		echo "======================================================================="
-            		pkgbuild $i
-        	else
-           	echo "===> $a is already installed"
-        	fi
-    	done
-}
-
-
 update() {
     echo "===> Checking ChangeLog.txt"
     old=$($pkg_ck -x $1 | awk 'NR==2{print $2}')
@@ -190,7 +95,8 @@ echo "usage: pkg [command] [argument]
 
 Available commands:
 search		(-s)  - searches the repository [TODO]
-fetch-ports	(-fp)  - fetch the ports collection [IN PROGRESS]
+fetch-ports	(-fp) - fetch the ports collection [IN PROGRESS]
+build		(-b)  - build a package
 install		(-i)  - installs SVR4 package
 update		(-u)  - updates packages [TODO]
 remove		(-r)  - uninstalls a package but does not delete it from cache
@@ -207,7 +113,7 @@ help		(-h)  - outputs this message"
 ## pkg
 ##
 case "$1" in
-	install*|-i*|update*|-u*|remove*|-r*|delete*|-d*|sync*|-sy*|fetch-ports*|-fp*)
+	install*|-i*|update*|-u*|remove*|-r*|delete*|-d*|sync*|-sy*|fetch-ports*|-fp*|build*|-b*)
 	if [ "$(id -u)" -ne 0 ]
         then
         	echo "You must be root"
@@ -233,6 +139,9 @@ case "$1" in
 		fetch-ports*|-fp*)
 			fetch_ports 
 			;;
+		build*|-b*)
+			pkgbuild "$2"
+			;;
 		esac
 	fi
 	;;
@@ -246,8 +155,8 @@ case "$1" in
     	usage
     	;;
     	verify*|-vf*)
-		## Change this to a separate function that compares the md5sum in a mkport to downloaded source
-		## or to verify repo credentials
+		## Change this to a separate function that compares the sha256sum in a mkport to downloaded source
+		## or to verify repo credentials (GPG)
 		if [ -z "$2" ]
 		then
 			echo "You must specify a package"

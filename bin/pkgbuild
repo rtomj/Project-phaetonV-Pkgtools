@@ -4,24 +4,22 @@
 ## pkgbuild builds ports from their mkport files
 ##
 
-. pkg
+ports_loc="/usr/ports"
 
 usage() {
 	echo "usage: pkgbuild category/port"
 }
 
-# heirloom tools to check for root. 
-# will be changed later
 if [ "$(id -u)" -ne 0 ]
 then
 	echo "You must be root"
         exit 1
 elif [ "$(id -u)" -eq 0 ]
 then
-	cd "$ports_loc""$1"
-	./mkport
-	pack=$(echo "$1" | awk -F'/' '{print $2}')
-	/usr/bin/pkg -i $pack
+	port=$(echo "$1" | awk -F'/' '{print $NF}')
+	cd "$ports_loc"/"$1"
+	makepkg "$port".mkport
+	/usr/bin/pkg -i $port
 else
         usage
 fi

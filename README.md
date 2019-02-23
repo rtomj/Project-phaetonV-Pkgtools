@@ -12,11 +12,11 @@ This project was tested on CRUX 3.4 with all core, opt, and xorg ports installed
 ##### Usage
 ##### 1) Get the ports tree 
 
-`ports fetch`
+`pkg fetch-ports`
 
 * Downloads `ports.tar.gz` and extracts it to `/usr/ports/` [TODO]
 * The file hierarchy is the same as on FreeBSD: `/usr/ports/category/port/`
-* Each port has a `mkport` which is similiar to Slackware's SlackBuilds or CRUX's Pkgfiles
+* Each port has a `mkport` which is similiar to CRUX's Pkgfiles
 
 ##### 2) Creating a `mkport`
 * See the sample-mkports in `bin` and `heirloom-bin`
@@ -25,9 +25,9 @@ This project was tested on CRUX 3.4 with all core, opt, and xorg ports installed
 
 `cd /usr/ports/category/port`
 
-`./mkport`
+`makepkg port.mkport`
 
-* This will create a `port-$VERSION.pkg` in `/var/spool/pkg`
+* This will create an `SVR4port-$VERSION-$ARCH.pkg` in `/var/spool/pkg`
 * You can also use `pkgbuild` or `heirloom-pkgbuild`. 
 
 `pkgbuild category/port`
@@ -45,9 +45,7 @@ This project was tested on CRUX 3.4 with all core, opt, and xorg ports installed
 `pkg update [port]`
 
 ##### TODO:
-* Rewrite `bin/pkgbuild` to use `makepkg`
 * Write an `heirloom-makepkg`
-* Rewrite `bin/pkg` and `heirloom-pkg` so they only manage packages and not build them
 * Fix checksum bug in `makepkg`
 * Instead of a `mkport`, use `port.mkport` 
 * Write a mkport generator

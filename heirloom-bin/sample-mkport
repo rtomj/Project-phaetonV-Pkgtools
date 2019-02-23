@@ -1,37 +1,29 @@
-#!/sbin/sh
-# Use heirloom sh and heirloom pkg
-. heirloom-pkg
+# Variables - used to generate pkginfo file for pkgmk 
+PKG=SVR4program
+ARCH=x86_64
+CLASSES=none
+# Adjust as needed
+BASEDIR=/
+NAME=program
+VERSION=1.0
+CATEGORY=x11
+DESC="Sample mkport"
+VENDOR=""
+PKGSAV=/var/sadm/pkg/SVR4program/save
+SOURCE=https://sourceofprogram.com/$NAME-1.0.tar.gz
+# sha256sum of source archive
+SHA256SUM=""
+DEPS="category/port category/port"
 
-# Variables - used to create pkginfo file for pkgmk
-pkg="program"
-version="1"
-category="system"
-arch="x86_64"
-# adjust if needed 
-basedir="/"
-pstamp="$version"
-name="sample mkport"
-source="https://urlofsourcecode.com/program-1.tar.gz"
-# category/port
-deps="system/dep1 system/dep2 base/dep3 base/dep4"
+build() {
+        tar xf $NAME-$VERSION.tar.gz
+        cd $NAME-$VERSION
+        make DESTDIR=/tmp/$NAME PREFIX=/usr/local install
+}
 
-# make dependencies
-mkdep
-# Make tmp directory
-mkdir -p /tmp/"$pkg"
+# Name this file program.mkport where program is the name of the port
 
-wget "$source"
+# Makepkg parses this file and Pkgmk creates the package using the generated pkginfo and prototype files.
 
-tar xf "$pkg"-"$1".tar.gz
-
-cd "$pkg"
-
-# prefix=/usr/local should be the default prefix with many programs but use it anyway
-./configure --prefix=/usr/local
-make
-DESTDIR=/tmp/"$pkg" make install
-
-# Pkgmk creates the package using the generated pkginfo and prototype files.
-mkpkg
-# /var/spool/pkg/program-1.pkg is created with pkgtrans and can be installed with
-# pkg -i program or pkg install program
+# /var/spool/pkg/SVR4program-1.0-x86_64.pkg is created with pkgtrans and can be installed with
+# pkg -i/install or pkgadd -d

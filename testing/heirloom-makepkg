@@ -1,0 +1,159 @@
+#!/sbin/sh
+
+#
+# Makepkg : packages programs into SVR4 package
+# 	    heirloom version
+# usage	  : makepkg [port].mkport
+#
+
+FILE="$1"
+dir=`pwd`
+sed="/usr/5bin/sed"
+awk="/usr/5bin/awk"
+grep="/usr/5bin/grep"
+
+# No arrays in heirloom sh... ugly and repetive but works
+PKG=`$grep PKG= $FILE | $awk -F'=' '{print $NF}'`
+ARCH=`$grep ARCH= $FILE | $awk -F'=' '{print $NF}'`
+NAME=`$grep NAME= $FILE | $awk -F'=' '{print $NF}'`
+VERSION=`$grep VERSION= $FILE | $awk -F'=' '{print $NF}'`
+SOURCE=`$grep SOURCE= $FILE | $awk -F'=' '{print $NF}'`
+
+SVR4PKG=""$PKG"-"$VERSION"-"$ARCH".pkg"
+CLASSES=`$grep CLASSES= $FILE | $awk -F'=' '{print $NF}'`
+CATEGORY=`$grep CATEGORY= $FILE | $awk -F'=' '{print $NF}'`
+BASEDIR=`$grep BASEDIR= $FILE | $awk -F'=' '{print $NF}'`
+PKGSAV=`$grep PKGSAV= $FILE | $awk -F'=' '{print $NF}'`
+
+archive=`$grep SOURCE= $FILE | $awk -F'/' '{print $NF}'`
+#correct_checksum=`grep SHA256sum= $FILE | awk -F'=' '{print $NF}'`
+#archive_checksum=`sha256sum "$archive" | awk '{print $1}'`
+
+info="PKG= ARCH= CLASSES= BASEDIR= NAME= VERSION= CATEGORY= VENDOR= PKGSAV= SOURCE= SHA256SUM= "
+
+
+make_tmp_dir() {
+	mkdir -p /tmp/"$NAME"
+}
+
+get_source() {
+	echo "====> Downloading source archive"
+	wget "$SOURCE"
+}
+
+compare_checksums() {
+	echo "====> Source checksum "$correct_checksum""
+	echo "====> Archive checksum "$archive_checksum""
+	if [ "$archive_checksum" != "$correct_checksum" ]
+	then
+		echo "Warning: checksums do not match. Deleting source archive."
+		#rm $dir/$archive
+		exit 1
+	elif [ "$archive_checksum" = "$correct_checksum" ]
+	then
+		echo "====> Verified archive checksum"
+	fi
+}
+
+# Build
+build_mkport() {
+	echo "====> Building from $dir/"$FILE""
+	. $dir/"$FILE"
+	build
+}
+
+# Generate pkginfo
+generate_pkginfo(){
+	touch $dir/pkginfo
+
+	#tmp_pkginfo="$dir/pkginfo"
+
+	echo "====> Creating pkginfo for "$FILE""
+	echo "PKG=$PKG
+NAME=$NAME
+VERSION=$VERSION
+ARCH=$ARCH
+CATEGORY=$CATEGORY
+BASEDIR=$BASEDIR 
+CLASSES=$CLASSES
+PKGSAV=$PKGSAV" > $dir/pkginfo
+
+}
+ 
+# Generate prototype
+
+generate_proto() {
+	## This is a mess
+	
+	dest=/tmp/"$NAME"/
+
+	## Generate tmp prototype
+	pkgproto "$dest"="$dest" > prototype
+	        
+	# heirloom sed (derived from Solaris) has no -i option...
+        tmp=`mktemp prototype.XXXXXX`
+	
+	## Change groups and owners
+	# This could cause some issues
+	# $sed -e 's/root/bin/g; 3d' prototype > "$tmp" && cat "$tmp" > prototype && rm "$tmp"
+
+	## fix file paths
+	# use heirloom nawk
+	nawk -v awk_dest="$dest" '{sub(awk_dest, ""); print}' prototype > "$tmp" && cat "$tmp" > prototype && rm "$tmp"
+
+	## Remove directories to avoid 'unable to remove" error when uninstalling
+	$sed '/=/!d' prototype > "$tmp" && cat "$tmp" > prototype && rm "$tmp"
+
+	## Add pkginfo and default BASEDIR
+	# heirloom sed newlines
+	$sed '1s/^/i pkginfo\
+!default 0755 root bin\
+/' prototype > "$tmp" && cat "$tmp" > prototype && rm "$tmp"
+
+}
+
+# Generate Package
+generate_package() {
+	# Suppress missing directory entry warnings 
+	# 2>/dev/null
+	pkgmk -o -d /tmp -a "$ARCH"
+
+	#touch "$SVR4PKG"
+	pkgtrans -s /tmp /var/spool/pkg/"$SVR4PKG" "$PKG" 
+
+	echo "====================================================="
+	echo "====> "$SVR4PKG" created"
+	echo "====================================================="
+
+}
+
+cleanup() {
+	rm -r /tmp/"$NAME"
+	rm $dir/"$archive"
+	rm -r /tmp/"$PKG"
+
+	# Don't delete /usr/5bin/pkginfo
+	if [ $dir != "/usr/5bin/" ]
+	then
+		rm $dir/prototype
+		rm $dir/pkginfo
+	else
+		echo "Cannot delete pkginfo"
+	fi
+}
+
+#########################################
+# Add case statement that lets user choose what functions to run
+main() {
+	make_tmp_dir
+	get_source
+	#compare_checksums
+	build_mkport
+	cd ..
+	generate_pkginfo
+	generate_proto
+	generate_package
+	cleanup
+}
+
+main

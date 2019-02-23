@@ -26,100 +26,6 @@ grep="/usr/5bin/grep"
 sgrep="/usr/5bin/s42/grep"
 tail="/usr/5bin/tail"
 
-## Configuration
-CC=/usr/bin/clang
-export CC
-CXX=/usr/bin/clang++
-export CXX
-
-MAKEFLAGS='-j4'
-export MAKEFLAGS
-
-##
-## packaging functions
-##
-
-chpkg() {
-	#echo "===> Checking package"
-	if [ -f "$pkg_loc"/"$pkg"-"$version".pkg ]
-	then
-        echo "======================================================================="
-		echo "===> "$pkg_loc"/"$pkg"-"$version".pkg successfully created"
-        echo "======================================================================="
-    fi
-}
-
-mkpkg() {
-	cd /tmp/$pkg
-	mkpkginfo
-	mkproto
-	echo "===> Creating package"
-    	$pkg_mk
-	$pkg_trans "$pkg_loc" "$pkg"-"$version".pkg "$pkg"
-    	rm -r "$pkg_loc"/"$pkg"
-    	rm -r /tmp/"$pkg"
-	chpkg
-}
-
-mkproto() {
-	echo "===> Creating prototype"
-	$pkg_proto "$category" .=. > prototype
-
-	# heirloom sed (derived from Solaris) has no -i option...
-	tmp=`mktemp prototype.XXXXXX`
-	$sed '/=/!d' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
-	
-	# exclude pkginfo and prototype
-	$sed '1d;2d;' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
-    
-	# newline
-	$sed '1s/^/i pkginfo\
-	/' prototype > "$tmp" && /usr/5bin/cat "$tmp" > prototype && rm "$tmp"
-}
-
-mkpkginfo() {
-	echo "===> Creating pkginfo"
-	echo "PKG="$pkg"" >> pkginfo
-	echo "NAME="$name"" >> pkginfo
-	echo "VERSION="$version"" >> pkginfo
-	echo "ARCH="$arch"" >> pkginfo
-	echo "CATEGORY="$category"" >> pkginfo
-	echo "PSTAMP="$version"" >> pkginfo
-	echo "BASEDIR="$basedir"" >> pkginfo
-}
-
-### Testing an automatic way to get source and setup for the build
-preproc() {
-        for i in $source
-        do
-                wget $i
-        done
-        mkdep
-        mkdir -p /tmp/$pkg
-}
-
-mkdep() {
-    echo "===> Checking dependencies for $pkg"
-    # array hack
-    set -- $deps
-    for i in $@
-    do
-        echo "===> Checking dependencies for $i"
-        a=`echo $i | /usr/5bin/awk -F'/' '{print $2}'`
-        d=`/usr/5bin/pkginfo | /usr/5bin/grep -c $a`
-        if [ $d -ne 0 ]
-        then
-            echo "======================================================================="
-            echo "===> Building $i"
-            echo "======================================================================="
-            pkgbuild $i
-        else
-            echo "===> $a is already installed"
-        fi
-    done
-}
-
-
 update() {
     echo "===> Checking ChangeLog.txt"
     old=`$pkg_ck -x $1 | $awk 'NR==2{print $2}'`
@@ -182,6 +88,7 @@ echo "usage: pkg [command] [argument]
 
 Available commands:
 search  (-s)  - searches the repository [TODO]
+build	(-b)  - build a package
 install (-i)  - installs SVR4 package
 update  (-u)  - updates packages [TODO]
 remove  (-r)  - uninstalls a package but does not delete it from cache
@@ -214,7 +121,7 @@ idcheck() {
 ## pkg
 ##
 case "$1" in
-	install*|-i*|update*|-u*|remove*|-r*|delete*|-d*|sync*|-sy*)
+	install*|-i*|update*|-u*|remove*|-r*|delete*|-d*|sync*|-sy*|build*|-b*)
     	id=`id | $awk -F'=' '{print $2}' | $awk -F'(' '{print $1}'`
 	if [ "$id" -ne 0 ]
         then
@@ -238,6 +145,9 @@ case "$1" in
             	sync*|-sy*)
             		echo "TODO"
             		;;
+		build*|-b*)
+			pkgbuild "$2"
+			;;
 		esac
 	fi
 	;;

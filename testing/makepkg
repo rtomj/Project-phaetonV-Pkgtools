@@ -97,8 +97,9 @@ generate_proto() {
 generate_package() {
 	# Suppress missing directory entry warnings 
 	pkgmk -o -d /tmp -a "$ARCH" 2>/dev/null
-	touch "$SVR4PKG"
-	pkgtrans -s /tmp "$SVR4PKG" "$PKG" 
+
+	#touch "$SVR4PKG"
+	pkgtrans -s /tmp /var/spool/pkg/"$SVR4PKG" "$PKG" 
 
 	echo "====================================================="
 	echo "====> "$SVR4PKG" created"

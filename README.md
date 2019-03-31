@@ -1,4 +1,4 @@
-### Project-phaetonV
+### SVR4pkgtools
 Package manager/frontend for the Heirloom SVR4 packaging tools.
 This project was tested on CRUX 3.4 with all core, opt, and xorg ports installed.
 
